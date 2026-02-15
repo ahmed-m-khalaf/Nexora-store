@@ -31,15 +31,15 @@ function Footer() {
                         <ul className="space-y-3">
                             <li className="flex items-center gap-3">
                                 <FaEnvelope className="text-primary-500" />
-                                <a href="mailto:ahmdalmhmwd939@gmail.com" className="hover:text-white transition">ahmdalmhmwd939@gmail.com</a>
+                                <a href="mailto:support@nexorastore.com" className="hover:text-white transition">support@nexorastore.com</a>
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaPhone className="text-primary-500" />
-                                <span>+20 123 456 7890</span>
+                                <span>+1 (555) 123-4567</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <FaMapMarkerAlt className="text-primary-500" />
-                                <span>Cairo, Egypt</span>
+                                <span>New York, USA</span>
                             </li>
                         </ul>
                     </div>
@@ -48,24 +48,24 @@ function Footer() {
                     <div>
                         <h4 className="text-lg font-semibold text-white mb-4">Follow Us</h4>
                         <div className="flex gap-4">
-                            <a href="https://github.com/ahmed-m-khalaf" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 hover:text-white transition-all duration-300">
+                            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 hover:text-white transition-all duration-300">
                                 <FaGithub size={20} />
                             </a>
-                            <a href="https://www.linkedin.com/in/ahmed-m-khalaf-9157aa319" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-300">
+                            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all duration-300">
                                 <FaLinkedin size={20} />
                             </a>
-                            <a href="https://www.instagram.com/ahmedmkhalaf1/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all duration-300">
+                            <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all duration-300">
                                 <FaInstagram size={20} />
                             </a>
-                            <a href="https://www.facebook.com/profile.php?id=100012536446096&locale=ar_AR" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-700 hover:text-white transition-all duration-300">
+                            <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-700 hover:text-white transition-all duration-300">
                                 <FaFacebook size={20} />
                             </a>
                         </div>
                         <a
-                            href="mailto:ahmdalmhmwd939@gmail.com"
+                            href="mailto:support@nexorastore.com"
                             className="inline-block mt-6 bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg transition-colors font-medium"
                         >
-                            Contact Me
+                            Contact Us
                         </a>
                     </div>
                 </div>
