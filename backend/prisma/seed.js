@@ -20,6 +20,10 @@ async function main() {
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
+  // Reset sequences to start clean from 1
+  await prisma.$executeRawUnsafe(`ALTER SEQUENCE "Category_id_seq" RESTART WITH 1;`);
+  await prisma.$executeRawUnsafe(`ALTER SEQUENCE "Product_id_seq" RESTART WITH 1;`);
+
   // 2. Seed Categories
   const categoryMap = new Map();
   for (const catName of categories) {
@@ -55,7 +59,16 @@ async function main() {
     console.log(`✅ Created Product: ${createdProduct.title} (ID: ${createdProduct.id})`);
   }
 
-  console.log('🎉 Database Seeding Completed Successfully!');
+  // 4. Sync PostgreSQL Auto-Increment Sequences to current max(id)
+  console.log('🔄 Syncing PostgreSQL ID Sequences...');
+  await prisma.$executeRawUnsafe(
+    `SELECT setval(pg_get_serial_sequence('"Product"', 'id'), coalesce((SELECT MAX(id) FROM "Product"), 1));`
+  );
+  await prisma.$executeRawUnsafe(
+    `SELECT setval(pg_get_serial_sequence('"Category"', 'id'), coalesce((SELECT MAX(id) FROM "Category"), 1));`
+  );
+
+  console.log('🎉 Database Seeding & Sequence Sync Completed Successfully!');
 }
 
 main()

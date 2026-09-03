@@ -65,8 +65,9 @@ PHASE 10: Testing, Deployment & Production Polish
 
 
 ### Phase 5 — Real Catalog API
-- [ ] ربط Endpoints المنتجات بقاعدة البيانات عبر Prisma
-- [ ] نقل عمليات البحث، الفلترة، والـ Pagination للـ Server-side
+- [x] ربط Endpoints المنتجات بقاعدة البيانات عبر Prisma
+- [x] نقل عمليات البحث، الفلترة، والـ Pagination للـ Server-side
+
 
 ### Phase 6 — Cart Architecture
 - [ ] فصل تفاصيل المنتج عن الـ Cart (تخزين `productId` و `quantity` فقط)
