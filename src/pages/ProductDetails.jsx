@@ -19,7 +19,7 @@ function ProductDetails() {
         setLoading(true)
         const data = await api.getProductById(id)
         setProduct(data)
-      } catch (err) {
+      } catch {
         setError('Failed to load product details.')
       } finally {
         setLoading(false)

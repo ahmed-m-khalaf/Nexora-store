@@ -8,24 +8,27 @@ import FadeIn from '../components/FadeIn'
 function Home() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    const fetchFeaturedProducts = async () => {
+        try {
+            setLoading(true)
+            setError(null)
+            const result = await api.getAllProducts()
+            // getAllProducts now returns { data, pagination }
+            const topProducts = result.data
+                .sort((a, b) => b.rating.rate - a.rating.rate)
+                .slice(0, 4)
+            setProducts(topProducts)
+        } catch (err) {
+            setError(err.message || 'Failed to fetch products')
+            console.error('Failed to fetch products:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     useEffect(() => {
-        const fetchFeaturedProducts = async () => {
-            try {
-                setLoading(true)
-                const data = await api.getAllProducts()
-                // Get top 4 products by rating
-                const topProducts = data
-                    .sort((a, b) => b.rating.rate - a.rating.rate)
-                    .slice(0, 4)
-                setProducts(topProducts)
-            } catch (error) {
-                console.error('Failed to fetch products:', error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
         fetchFeaturedProducts()
     }, [])
 
@@ -41,6 +44,16 @@ function Home() {
 
                     {loading ? (
                         <Loader />
+                    ) : error ? (
+                        <div className="text-center py-8">
+                            <p className="text-red-500 mb-4">{error}</p>
+                            <button
+                                onClick={fetchFeaturedProducts}
+                                className="px-6 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition"
+                            >
+                                🔄 Retry
+                            </button>
+                        </div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {products.map(product => (
