@@ -6,11 +6,15 @@ function ProductCard({ product }) {
     const { addToCart } = useCart()
     const [isAdded, setIsAdded] = useState(false)
 
-    const handleAddToCart = (e) => {
+    const handleAddToCart = async (e) => {
         e.preventDefault() // Prevent navigation if clicked inside Link
-        addToCart(product)
-        setIsAdded(true)
-        setTimeout(() => setIsAdded(false), 1500)
+        try {
+            await addToCart(product.id)
+            setIsAdded(true)
+            setTimeout(() => setIsAdded(false), 1500)
+        } catch (err) {
+            console.error('Failed to add product to cart:', err)
+        }
     }
 
     return (

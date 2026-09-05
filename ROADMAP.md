@@ -18,11 +18,11 @@ PHASE 3: Frontend-Backend Integration (React ↔ Express)
    ↓
 PHASE 4: PostgreSQL + Prisma Foundations (Cloud DB: Neon/Supabase)
    ↓
-PHASE 5: Catalog Migration (DB-Driven Search, Filter, Pagination, Sorting)  ← أنت هنا
+PHASE 5: Catalog Migration (DB-Driven Search, Filter, Pagination, Sorting) ✅
    ↓
-PHASE 6: Cart Architecture (Guest Cart vs Server Cart)
+PHASE 6: Cart Architecture (Guest Cart vs Server Cart) ✅
    ↓
-PHASE 7: Orders & Checkout (Business Logic, Server Pricing & Transactions)
+PHASE 7: Orders & Checkout (Business Logic, Server Pricing & Transactions) ← أنت هنا
    ↓
 PHASE 8: Authentication & Authorization (Users, JWT, Passwords & Protection)
    ↓
@@ -131,9 +131,22 @@ React
 
 ---
 
-### Phase 6 — Cart Architecture
-- [ ] فصل تفاصيل المنتج عن الـ Cart (تخزين `productId` و `quantity` فقط)
-- [ ] إعداد هيكلية Cart API
+### Phase 6 — Cart Architecture (Server-Driven Guest Cart) ✅
+
+- [x] **نمذجة قاعدة البيانات**: إضافة `Cart` و `CartItem` في Prisma Schema مع علاقات و `@@index` وملاءمة `userId` مستقبلياً
+- [x] **هيكل البيانات الموحد**: حفظ `productId` و `quantity` فقط داخل السلة دون الاعتماد على أسعار الواجهة
+- [x] **حساب الإجماليات على السيرفر**: حساب `subtotal`, `tax` (10%), `shipping`, و `total` بالكامل على السيرفر
+- [x] **Cart API Endpoints**:
+  - `GET /api/cart` (جلب السلة أو إنشائها)
+  - `POST /api/cart/items` (إضافة عنصر أو زيادة الكمية)
+  - `PATCH /api/cart/items/:productId` (تعديل الكمية أو الحذف عند 0)
+  - `DELETE /api/cart/items/:productId` (حذف عنصر)
+  - `DELETE /api/cart` (تفريغ السلة)
+- [x] **تكامل React**: تحديث `CartContext` و `api.js` لاستخدام `x-cart-id` الفريد لكل زائر (Guest UUID)
+- [x] **تحديث الواجهة**: تحديث صفحات `ProductCard`, `ProductDetails`, `Cart`, و `Navbar`
+- [x] **شامل الاختبارات (100%)**: إنشاء `backend/tests/cart.test.js` لاختبار العزل، الإجماليات، الأخطاء والعمليات
+
+---
 
 ### Phase 7 — Orders & Checkout
 - [ ] إنشاء Model للـ `Order` والـ `OrderItem`
@@ -153,3 +166,4 @@ React
 ### Phase 10 — Testing & Deployment
 - [ ] اختبار جميع الـ Endpoints والـ Edge cases
 - [ ] رفع السيرفر والداتا بيز وتحديث بيئة الإنتاج
+

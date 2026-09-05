@@ -5,10 +5,14 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 /**
  * Generic fetch wrapper with standardized error handling
  */
-const apiFetch = async (url) => {
+const apiFetch = async (url, options = {}) => {
   let response;
   try {
-    response = await fetch(url);
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+    response = await fetch(url, { ...options, headers });
   } catch {
     throw new Error('Network error. Please check your connection and try again.');
   }
@@ -27,15 +31,6 @@ const apiFetch = async (url) => {
 export const api = {
   /**
    * Get products with server-side search, filter, sort, and pagination.
-   * Always returns { data: [...], pagination: { total, page, limit, totalPages } }
-   *
-   * @param {Object} params
-   * @param {string}  [params.search]     - Search term for title/description
-   * @param {string}  [params.category]   - Category name filter
-   * @param {number}  [params.page=1]     - Page number
-   * @param {number}  [params.limit=12]   - Items per page
-   * @param {string}  [params.sortBy]     - Sort field: id, title, price, createdAt
-   * @param {string}  [params.order]      - Sort direction: asc, desc
    */
   getProducts: async ({ search, category, page = 1, limit = 12, sortBy, order } = {}) => {
     const params = new URLSearchParams();
@@ -51,7 +46,6 @@ export const api = {
 
   /**
    * Get all products without pagination (for Home page featured products).
-   * Returns the unified { data, pagination } format.
    */
   getAllProducts: async () => {
     return apiFetch(`${API_BASE_URL}/products?page=1&limit=100`);
@@ -78,5 +72,58 @@ export const api = {
     return apiFetch(
       `${API_BASE_URL}/products/category/${encodeURIComponent(category)}`
     );
+  },
+
+  // --- Cart API Methods ---
+
+  /**
+   * Get cart for a given cartId
+   */
+  getCart: async (cartId) => {
+    return apiFetch(`${API_BASE_URL}/cart`, {
+      headers: cartId ? { 'x-cart-id': cartId } : {},
+    });
+  },
+
+  /**
+   * Add item to cart
+   */
+  addToCart: async (cartId, productId, quantity = 1) => {
+    return apiFetch(`${API_BASE_URL}/cart/items`, {
+      method: 'POST',
+      headers: cartId ? { 'x-cart-id': cartId } : {},
+      body: JSON.stringify({ productId, quantity }),
+    });
+  },
+
+  /**
+   * Update item quantity in cart
+   */
+  updateCartItem: async (cartId, productId, quantity) => {
+    return apiFetch(`${API_BASE_URL}/cart/items/${productId}`, {
+      method: 'PATCH',
+      headers: cartId ? { 'x-cart-id': cartId } : {},
+      body: JSON.stringify({ quantity }),
+    });
+  },
+
+  /**
+   * Remove item from cart
+   */
+  removeCartItem: async (cartId, productId) => {
+    return apiFetch(`${API_BASE_URL}/cart/items/${productId}`, {
+      method: 'DELETE',
+      headers: cartId ? { 'x-cart-id': cartId } : {},
+    });
+  },
+
+  /**
+   * Clear all items in cart
+   */
+  clearCart: async (cartId) => {
+    return apiFetch(`${API_BASE_URL}/cart`, {
+      method: 'DELETE',
+      headers: cartId ? { 'x-cart-id': cartId } : {},
+    });
   },
 };

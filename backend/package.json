@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "test": "node tests/api.test.js"
+    "test": "node tests/api.test.js",
+    "test:cart": "node tests/cart.test.js",
+    "test:all": "node tests/api.test.js && node tests/cart.test.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

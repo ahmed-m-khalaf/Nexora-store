@@ -29,23 +29,24 @@ function ProductDetails() {
     fetchProduct()
   }, [id])
 
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product)
-    }
+  const handleAddToCart = async (e) => {
+    try {
+      await addToCart(product.id, quantity)
 
-    // Button feedback logic
-    const btn = document.activeElement
-    if (btn) {
-      const originalText = btn.innerText
-      btn.innerText = 'Added to Cart! ✅'
-      btn.classList.add('bg-green-600')
-      btn.classList.remove('bg-primary-600', 'hover:bg-primary-700')
-      setTimeout(() => {
-        btn.innerText = originalText
-        btn.classList.remove('bg-green-600')
-        btn.classList.add('bg-primary-600', 'hover:bg-primary-700')
-      }, 1500)
+      const btn = e.currentTarget
+      if (btn) {
+        const originalText = btn.innerText
+        btn.innerText = 'Added to Cart! ✅'
+        btn.classList.add('bg-green-600')
+        btn.classList.remove('bg-primary-600', 'hover:bg-primary-700')
+        setTimeout(() => {
+          btn.innerText = originalText
+          btn.classList.remove('bg-green-600')
+          btn.classList.add('bg-primary-600', 'hover:bg-primary-700')
+        }, 1500)
+      }
+    } catch (err) {
+      console.error('Failed to add to cart:', err)
     }
   }
 
