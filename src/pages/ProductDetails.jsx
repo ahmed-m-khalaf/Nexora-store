@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { api } from '../utils/api'
-import { useCart } from '../context/CartContext'
+import { useCart } from '../context/useCart'
 import Loader from '../components/Loader'
 import FadeIn from '../components/FadeIn'
 

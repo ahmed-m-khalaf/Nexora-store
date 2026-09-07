@@ -1,10 +1,11 @@
-import { Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
+import { Link, useNavigate } from 'react-router-dom'
+import { useCart } from '../context/useCart'
 import FadeIn from '../components/FadeIn'
 import Loader from '../components/Loader'
 
 function Cart() {
     const { cart, cartData, loading, error, clearCart, removeFromCart, updateQuantity } = useCart()
+    const navigate = useNavigate()
 
     if (loading) return <Loader />
 
@@ -120,7 +121,7 @@ function Cart() {
                         </div>
 
                         <button
-                            onClick={() => alert('Checkout functionality coming in Phase 7!')}
+                            onClick={() => navigate('/checkout')}
                             className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-lg transition shadow-md hover:shadow-lg mb-4 cursor-pointer"
                         >
                             Proceed to Checkout

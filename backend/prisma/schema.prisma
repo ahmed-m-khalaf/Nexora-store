@@ -26,10 +26,12 @@ model Product {
   description String
   image       String
   categoryId  Int
+  stock       Int      @default(10)
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   cartItems   CartItem[]
+  orderItems  OrderItem[]
 
   @@index([categoryId])
   @@index([price])
@@ -40,10 +42,55 @@ model Cart {
   id        String     @id @default(uuid())
   userId    Int?       @unique
   items     CartItem[]
+  orders    Order[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 
   @@index([userId])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  cartId          String
+  cart            Cart        @relation(fields: [cartId], references: [id])
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  shippingAddress String
+  status          OrderStatus @default(PENDING)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  tax             Decimal     @db.Decimal(10, 2)
+  shipping        Decimal     @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([cartId])
+  @@index([status])
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  title     String
+  unitPrice Decimal  @db.Decimal(10, 2)
+  quantity  Int
+  lineTotal Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model CartItem {
@@ -60,4 +107,3 @@ model CartItem {
   @@index([cartId])
   @@index([productId])
 }
-

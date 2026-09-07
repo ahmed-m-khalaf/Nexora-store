@@ -1,0 +1,97 @@
+<mxfile host="app.diagrams.net" agent="Antigravity AI">
+  <diagram id="phase56-architecture" name="Nexora Store - Phase 5 &amp; 6 Architecture">
+    <mxGraphModel dx="1271" dy="669" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1400" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;fontStyle=1;fontColor=#1E293B;" value="Nexora Store — Phase 5 (Catalog) &amp; Phase 6 (Cart) Full Architecture" vertex="1">
+          <mxGeometry height="40" width="900" x="350" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="swimlane-frontend" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#64748B;fontStyle=1;fontSize=14;fontColor=#0F172A;startSize=30;" value="React 19 Frontend (Client Layer)" vertex="1">
+          <mxGeometry height="1240" width="460" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="banner-p5-fe" parent="swimlane-frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;fontColor=#1E40AF;fontStyle=1;fontSize=13;" value="PHASE 5: DB-Driven Product Catalog" vertex="1">
+          <mxGeometry height="35" width="420" x="20" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-products-page" parent="swimlane-frontend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=2;align=left;spacingLeft=10;fontColor=#1E293B;" value="Products.jsx Page&#xa;• SearchBar (Debounce 400ms)&#xa;• CategoryFilter (All, Electronics, etc)&#xa;• SortSelect (Price, Name, Newest)&#xa;• Pagination Controls (Prev/Next/Pages)" vertex="1">
+          <mxGeometry height="110" width="400" x="30" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-api-catalog" parent="swimlane-frontend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;align=left;spacingLeft=10;fontColor=#1E40AF;" value="src/utils/api.js (getProducts)&#xa;Sends: ?search=...&amp;category=...&amp;page=1&amp;limit=12&amp;sortBy=...&amp;order=..." vertex="1">
+          <mxGeometry height="60" width="400" x="30" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="banner-p6-fe" parent="swimlane-frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#166534;fontStyle=1;fontSize=13;" value="PHASE 6: Guest Cart UUID &amp; Reactive UI" vertex="1">
+          <mxGeometry height="35" width="420" x="20" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-cart-context" parent="swimlane-frontend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2;align=left;spacingLeft=10;fontColor=#1E293B;" value="CartContext.jsx&#xa;• Guest UUID (localStorage nexora_cart_id)&#xa;• State: cartData { items, itemCount, subtotal, tax, shipping, total }&#xa;• Actions: loadCart, addToCart, updateQuantity, removeFromCart, clearCart" vertex="1">
+          <mxGeometry height="110" width="400" x="30" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="fe-cart-views" parent="swimlane-frontend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#16A34A;align=left;spacingLeft=10;fontColor=#166534;" value="UI Components&#xa;• ProductCard &amp; ProductDetails: Add to Cart (productId, quantity)&#xa;• Cart.jsx: Server Math Display (Subtotal, Tax 10%, Shipping, Total)&#xa;• Navbar.jsx: Dynamic Badge (itemCount)" vertex="1">
+          <mxGeometry height="100" width="400" x="30" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="swimlane-backend" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#475569;fontStyle=1;fontSize=14;fontColor=#0F172A;startSize=30;" value="Express 4 Backend API (Server Layer)" vertex="1">
+          <mxGeometry height="1240" width="970" x="550" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="banner-p5-be" parent="swimlane-backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;fontColor=#1E40AF;fontStyle=1;fontSize=13;" value="PHASE 5: Product Catalog Controllers &amp; Validation" vertex="1">
+          <mxGeometry height="35" width="460" x="20" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="be-product-routes" parent="swimlane-backend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=2;align=left;spacingLeft=10;fontColor=#1E293B;" value="productRoutes.js&#xa;GET /api/products&#xa;GET /api/products/:id&#xa;GET /api/products/category/:category" vertex="1">
+          <mxGeometry height="75" width="440" x="30" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="be-product-controller" parent="swimlane-backend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#2563EB;align=left;spacingLeft=10;fontColor=#1E40AF;" value="productController.js (getAllProducts)&#xa;1. Parse &amp; Validate (page &gt; 0, limit &lt;= 100, price &gt;= 0)&#xa;2. Build Prisma Where Clause (contains insensitive, category)&#xa;3. Execute findMany + count concurrently&#xa;4. Standardized Response Format:&#xa;   { data: [...], pagination: { total, page, limit, totalPages } }" vertex="1">
+          <mxGeometry height="120" width="440" x="30" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="banner-p6-be" parent="swimlane-backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#166534;fontStyle=1;fontSize=13;" value="PHASE 6: Cart Controller, Math &amp; x-cart-id Header" vertex="1">
+          <mxGeometry height="35" width="460" x="20" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="be-cart-routes" parent="swimlane-backend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2;align=left;spacingLeft=10;fontColor=#1E293B;" value="cartRoutes.js (Base: /api/cart)&#xa;GET / (Get/Create Cart) | POST /items (Add/Upsert Item)&#xa;PATCH /items/:productId (Update/Delete if &lt;= 0)&#xa;DELETE /items/:productId (Remove) | DELETE / (Clear Cart)" vertex="1">
+          <mxGeometry height="90" width="440" x="30" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="be-cart-controller" parent="swimlane-backend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#16A34A;align=left;spacingLeft=10;fontColor=#166534;" value="cartController.js &amp; Server Math&#xa;• Read x-cart-id Header (or Query Param)&#xa;• Product Existence &amp; Quantity Validation (quantity &gt; 0)&#xa;• Server Math:&#xa;  - subtotal = Σ(quantity * product.price)&#xa;  - tax = 10% of subtotal&#xa;  - shipping = $10 if subtotal &lt; $100 (else FREE)&#xa;  - total = subtotal + tax + shipping" vertex="1">
+          <mxGeometry height="120" width="440" x="30" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="summary-box" parent="swimlane-backend" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;strokeWidth=2;align=left;spacingLeft=15;fontColor=#78350F;fontSize=12;" value=" Architectural Highlights (Phase 5 &amp; Phase 6)&#xa;&#xa;1. Zero Price Trust: Frontend only sends productId &amp; quantity. Prices &amp; math computed strictly on Express Server.&#xa;2. Server-Side Pagination &amp; Filter: Prisma queries indexed title/price/categoryId with skip/take pagination.&#xa;3. Guest Session Management: Frontend generates UUID stored in localStorage and attached via x-cart-id header.&#xa;4. Clean Data Normalization: Cart stores normalized CartItem rows (productId + quantity) with DB cascade deletion.&#xa;5. Future Auth Readiness: Cart table contains nullable userId Int? for seamless cart merging in Phase 8." vertex="1">
+          <mxGeometry height="130" width="1460" x="-490" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="swimlane-db" parent="1" style="swimlane;whiteSpace=wrap;html=1;fillColor=#EEF2FF;strokeColor=#4338CA;fontStyle=1;fontSize=14;fontColor=#1E1B4B;startSize=30;" value="Prisma ORM &amp; PostgreSQL (Data Layer)" vertex="1">
+          <mxGeometry height="1240" width="460" x="1100" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="banner-p5-db" parent="swimlane-db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#2563EB;fontColor=#1E40AF;fontStyle=1;fontSize=13;" value="PHASE 5: Category &amp; Product Models + Indexes" vertex="1">
+          <mxGeometry height="35" width="420" x="20" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="db-product-model" parent="swimlane-db" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4338CA;strokeWidth=2;align=left;spacingLeft=10;fontColor=#1E1B4B;" value="Product Model&#xa;• id: Int (PK)&#xa;• title: String (Indexed)&#xa;• price: Decimal(10, 2) (Indexed)&#xa;• description: String&#xa;• image: String&#xa;• categoryId: Int (FK, Indexed)" vertex="1">
+          <mxGeometry height="120" width="400" x="30" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="db-category-model" parent="swimlane-db" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#EEF2FF;strokeColor=#4338CA;align=left;spacingLeft=10;fontColor=#1E1B4B;" value="Category Model&#xa;• id: Int (PK)&#xa;• name: String (Unique)&#xa;• slug: String (Unique)" vertex="1">
+          <mxGeometry height="75" width="400" x="30" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="banner-p6-db" parent="swimlane-db" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontColor=#166534;fontStyle=1;fontSize=13;" value="PHASE 6: Cart &amp; CartItem Models (Normalized)" vertex="1">
+          <mxGeometry height="35" width="420" x="20" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="db-cart-model" parent="swimlane-db" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2;align=left;spacingLeft=10;fontColor=#1E293B;" value="Cart Model&#xa;• id: String (UUID PK)&#xa;• userId: Int? (Unique, Nullable for Auth merge)&#xa;• createdAt: DateTime&#xa;• updatedAt: DateTime" vertex="1">
+          <mxGeometry height="90" width="400" x="30" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="db-cartitem-model" parent="swimlane-db" style="shape=rect;rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#16A34A;align=left;spacingLeft=10;fontColor=#166534;" value="CartItem Model (Normalized)&#xa;• id: Int (PK)&#xa;• cartId: String (FK Cart, Cascade Delete)&#xa;• productId: Int (FK Product, Cascade Delete)&#xa;• quantity: Int (Default 1)&#xa;• @@unique([cartId, productId])" vertex="1">
+          <mxGeometry height="120" width="400" x="30" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-catalog-1" edge="1" parent="1" source="fe-api-catalog" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=2;fontColor=#1E40AF;" target="be-product-routes" value="GET /api/products?search=...&amp;page=1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-catalog-2" edge="1" parent="1" source="be-product-controller" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=2;fontColor=#1E40AF;" target="db-product-model" value="findMany &amp; count">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-cart-1" edge="1" parent="1" source="fe-cart-context" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontColor=#166534;" target="be-cart-routes" value="HTTP Requests + x-cart-id Header">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-cart-2" edge="1" parent="1" source="be-cart-controller" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontColor=#166534;" target="db-cartitem-model" value="Prisma Upsert / Include Product">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-cart-3" edge="1" parent="1" source="db-cartitem-model" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=1;dashed=1;fontColor=#166534;" target="db-cart-model" value="Cascade Relation">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-cart-4" edge="1" parent="1" source="db-cartitem-model" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=1;dashed=1;fontColor=#166534;" target="db-product-model" value="Product Details Lookup">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

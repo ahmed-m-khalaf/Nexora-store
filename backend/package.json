@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "test": "node tests/api.test.js",
     "test:cart": "node tests/cart.test.js",
-    "test:all": "node tests/api.test.js && node tests/cart.test.js"
+    "test:orders": "node tests/order.test.js",
+    "test:all": "node tests/run-all.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -22,4 +23,3 @@
     "seed": "node prisma/seed.js"
   }
 }
-

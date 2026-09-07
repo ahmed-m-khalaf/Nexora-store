@@ -4,7 +4,8 @@
  * Requires the backend server to be running on PORT 5000
  */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000/api';
+const ROOT_URL = process.env.TEST_ROOT_URL || BASE_URL.replace(/\/api\/?$/, '');
 
 let passed = 0;
 let failed = 0;
@@ -133,7 +134,7 @@ async function runTests() {
   console.log('\n🔍 Error Handling');
 
   await test('GET /nonexistent returns 404 with error format', async () => {
-    const { status, data } = await fetchJSON('http://localhost:5000/nonexistent');
+    const { status, data } = await fetchJSON(`${ROOT_URL}/nonexistent`);
     assert(status === 404, `Expected 404, got ${status}`);
     assert(data.error === true, 'Should have error: true');
     assert(typeof data.message === 'string', 'Should have error message');

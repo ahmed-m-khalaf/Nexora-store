@@ -3,6 +3,7 @@ import cors from 'cors';
 import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,6 +29,7 @@ app.get('/', (req, res) => {
       products: '/api/products',
       categories: '/api/categories',
       cart: '/api/cart',
+      orders: '/api/orders',
     },
   });
 });
@@ -36,6 +38,7 @@ app.get('/', (req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 // Fallback Route (404 for unknown endpoints)

@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { api } from '../utils/api'
-
-const CartContext = createContext()
+import { CartContext } from './cartContextValue'
 
 const getOrCreateGuestCartId = () => {
     let cartId = localStorage.getItem('nexora_cart_id')
@@ -105,6 +104,27 @@ export function CartProvider({ children }) {
         }
     }
 
+    // Checkout uses the server-side cart. The browser only supplies contact details.
+    const checkout = async (customer) => {
+        try {
+            setError(null)
+            const order = await api.checkout(cartId, customer)
+            setCartData({
+                id: cartId,
+                items: [],
+                itemCount: 0,
+                subtotal: 0,
+                tax: 0,
+                shipping: 0,
+                total: 0,
+            })
+            return order
+        } catch (err) {
+            setError(err.message || 'Failed to place order')
+            throw err
+        }
+    }
+
     const getCartTotal = () => cartData.total
     const getCartCount = () => cartData.itemCount
 
@@ -121,6 +141,7 @@ export function CartProvider({ children }) {
                 removeFromCart,
                 updateQuantity,
                 clearCart,
+                checkout,
                 getCartTotal,
                 getCartCount,
             }}
@@ -128,8 +149,4 @@ export function CartProvider({ children }) {
             {children}
         </CartContext.Provider>
     )
-}
-
-export function useCart() {
-    return useContext(CartContext)
 }

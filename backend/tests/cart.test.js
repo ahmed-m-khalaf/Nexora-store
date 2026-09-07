@@ -4,7 +4,7 @@
  * Requires backend server running on http://localhost:5000
  */
 
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = process.env.API_BASE_URL || 'http://localhost:5000/api';
 
 let passed = 0;
 let failed = 0;

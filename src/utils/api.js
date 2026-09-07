@@ -126,4 +126,15 @@ export const api = {
       headers: cartId ? { 'x-cart-id': cartId } : {},
     });
   },
+
+  /**
+   * Place an order from the server-side guest cart.
+   */
+  checkout: async (cartId, customer) => {
+    return apiFetch(`${API_BASE_URL}/orders/checkout`, {
+      method: 'POST',
+      headers: cartId ? { 'x-cart-id': cartId } : {},
+      body: JSON.stringify(customer),
+    });
+  },
 };

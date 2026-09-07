@@ -17,6 +17,10 @@ async function main() {
   console.log('🌱 Starting Database Seeding...');
 
   // 1. Clean existing data
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
   await prisma.product.deleteMany();
   await prisma.category.deleteMany();
 
@@ -53,7 +57,8 @@ async function main() {
         price: prod.price,
         description: prod.description,
         image: prod.image,
-        categoryId: categoryId
+        categoryId: categoryId,
+        stock: 25,
       }
     });
     console.log(`✅ Created Product: ${createdProduct.title} (ID: ${createdProduct.id})`);
