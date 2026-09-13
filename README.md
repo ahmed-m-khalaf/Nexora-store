@@ -19,14 +19,19 @@ Nexora Store is a learning-focused e-commerce application being built incrementa
 ```
 Nexora-store/
 ├── src/                   # React Frontend (Vite)
-│   ├── components/        # Reusable UI components
-│   ├── context/           # React Context (Cart)
-│   ├── pages/             # Page components (Home, Products, Cart, etc.)
-│   └── utils/             # API client & helpers
+│   ├── app/               # Application shell, routing, and entry point
+│   ├── components/        # Shared UI grouped by catalog, layout, and common
+│   ├── features/cart/     # Cart state, context, and cart-specific hooks
+│   ├── pages/             # Route-level page components
+│   ├── services/          # Typed backend API client
+│   ├── types/             # Canonical frontend domain types
+│   ├── utils/             # Small cross-feature helpers
+│   └── styles/            # Global and application styles
 ├── backend/               # Express Backend
 │   ├── src/
-│   │   ├── controllers/   # Route handlers (products, categories)
+│   │   ├── controllers/   # Thin HTTP adapters
 │   │   ├── routes/        # Express route definitions
+│   │   ├── services/       # Business logic (checkout/orders)
 │   │   ├── lib/           # Prisma client singleton
 │   │   └── data/          # Static seed data
 │   ├── prisma/            # Prisma schema, migrations, seed
@@ -158,7 +163,7 @@ All errors return a consistent format:
 
 ## Current Phase
 
-**Phase 5 — Catalog Migration** ✅ Complete
+**Phase 7 — Orders & Checkout** ✅ Complete
 
 See [ROADMAP.md](ROADMAP.md) for the full development plan.
 

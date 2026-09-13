@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/useCart'
+import { useCart } from '../../features/cart/useCart'
 
 function Navbar() {
     const { getCartCount } = useCart()

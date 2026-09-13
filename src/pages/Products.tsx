@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
-import { api } from '../utils/api'
-import ProductCard from '../components/ProductCard'
-import Loader from '../components/Loader'
-import SearchBar from '../components/SearchBar'
-import CategoryFilter from '../components/CategoryFilter'
-import FadeIn from '../components/FadeIn'
+import { api } from '../services/api'
+import CategoryFilter from '../components/catalog/CategoryFilter'
+import ProductCard from '../components/catalog/ProductCard'
+import SearchBar from '../components/catalog/SearchBar'
+import FadeIn from '../components/common/FadeIn'
+import Loader from '../components/common/Loader'
+import type { Pagination, Product, ProductSortField, SortOrder } from '../types'
+import { getErrorMessage } from '../utils/errors'
 
 const SORT_OPTIONS = [
     { label: 'Default', value: 'id-asc' },
@@ -19,13 +21,13 @@ const ITEMS_PER_PAGE = 12
 
 function Products() {
     // Data state
-    const [products, setProducts] = useState([])
-    const [categories, setCategories] = useState([])
-    const [pagination, setPagination] = useState({ total: 0, page: 1, limit: ITEMS_PER_PAGE, totalPages: 1 })
+    const [products, setProducts] = useState<Product[]>([])
+    const [categories, setCategories] = useState<string[]>([])
+    const [pagination, setPagination] = useState<Pagination>({ total: 0, page: 1, limit: ITEMS_PER_PAGE, totalPages: 1 })
 
     // UI state
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const [error, setError] = useState<string | null>(null)
 
     // Filter/search/sort state
     const [searchTerm, setSearchTerm] = useState('')
@@ -68,7 +70,7 @@ function Products() {
             setLoading(true)
             setError(null)
 
-            const [sortBy, order] = sortValue.split('-')
+            const [sortBy, order] = sortValue.split('-') as [ProductSortField, SortOrder]
 
             const result = await api.getProducts({
                 search: debouncedSearch,
@@ -81,8 +83,8 @@ function Products() {
 
             setProducts(result.data)
             setPagination(result.pagination)
-        } catch (err) {
-            setError(err.message || 'Failed to load products. Please try again.')
+        } catch (fetchError: unknown) {
+            setError(getErrorMessage(fetchError, 'Failed to load products. Please try again.'))
             setProducts([])
         } finally {
             setLoading(false)
@@ -94,7 +96,7 @@ function Products() {
     }, [fetchProducts])
 
     // Pagination handlers
-    const goToPage = (page) => {
+    const goToPage = (page: number) => {
         if (page >= 1 && page <= pagination.totalPages) {
             setCurrentPage(page)
             window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -102,12 +104,12 @@ function Products() {
     }
 
     // Generate page numbers to display
-    const getPageNumbers = () => {
+    const getPageNumbers = (): number[] => {
         const { totalPages } = pagination
         const pages = []
         const maxVisible = 5
         let start = Math.max(1, currentPage - Math.floor(maxVisible / 2))
-        let end = Math.min(totalPages, start + maxVisible - 1)
+        const end = Math.min(totalPages, start + maxVisible - 1)
         if (end - start < maxVisible - 1) {
             start = Math.max(1, end - maxVisible + 1)
         }

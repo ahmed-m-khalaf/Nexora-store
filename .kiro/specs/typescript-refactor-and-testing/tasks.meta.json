@@ -1,0 +1,438 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Install dependencies for Frontend TypeScript and testing": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069625055
+      }
+    ],
+    "2. Install Vitest for the Backend": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626244
+      }
+    ],
+    "3.1 Create `vitest.config.ts` at the workspace root configuring jsdom environment, globals, setupFiles pointing to `src/__tests__/setup.ts`, and include pattern `src/__tests__/**/*.test.{ts,tsx}`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626306
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069638414
+      }
+    ],
+    "3.2 Create `src/__tests__/setup.ts` that imports `@testing-library/jest-dom`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626402
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069661076
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069733493
+      }
+    ],
+    "4.1 Create `backend/vitest.config.js` with two projects: `unit` (node env, `tests/unit/**/*.test.js`, setupFiles `tests/unit/setup.js`) and `integration` (node env, `tests/integration/**/*.test.js`, setupFiles `tests/integration/setup.js`)": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626456
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069661710
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069751879
+      }
+    ],
+    "5.1 Create `backend/src/app.js` that configures and exports the Express `app` (all middleware, routes, error handler) without calling `app.listen`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626507
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069752330
+      }
+    ],
+    "5.2 Rewrite `backend/src/server.js` to only import `app` from `./app.js` and call `app.listen(PORT, ...)`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626548
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069817014
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069856076
+      }
+    ],
+    "6.1 Create `backend/tests/unit/setup.js` that calls `vi.mock('../../src/lib/prisma.js', ...)` with stubbed methods for `product`, `category`, `cart`, `cartItem`, `order`, and `$transaction`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626591
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069856256
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069923015
+      }
+    ],
+    "7.1 Create `backend/tests/unit/productController.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626646
+      },
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069943897
+      }
+    ],
+    "7.2 Implement `getAllProducts` unit tests": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626687
+      }
+    ],
+    "7.3 Implement `getProductById` unit tests": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626736
+      }
+    ],
+    "7.4 Implement `createProduct` unit tests": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626796
+      }
+    ],
+    "7.5 Implement `updateProduct` / `deleteProduct` unit tests": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626843
+      }
+    ],
+    "8.1 Create `backend/tests/unit/categoryController.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626891
+      }
+    ],
+    "9.1 Create `backend/tests/unit/cartController.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069626939
+      }
+    ],
+    "10.1 Create `backend/tests/unit/orderController.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627006
+      }
+    ],
+    "11. Checkpoint — Unit tests passing": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627082
+      }
+    ],
+    "12.1 Create `backend/tests/integration/setup.js` with `startServer` / `stopServer` / `getBaseUrl` helpers that bind to port `0` using `http.createServer(app)`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627125
+      }
+    ],
+    "12.2 Create `.env.test` in `backend/` documenting the `DATABASE_URL` variable for the test database; the file contains only a commented template (actual value supplied by the developer)": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627181
+      }
+    ],
+    "13.1 Create `backend/tests/integration/products.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627230
+      }
+    ],
+    "14.1 Create `backend/tests/integration/categories.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627279
+      }
+    ],
+    "15.1 Create `backend/tests/integration/cart.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627335
+      }
+    ],
+    "16.1 Create `backend/tests/integration/orders.test.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627389
+      }
+    ],
+    "17. Checkpoint — Integration tests passing": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627436
+      }
+    ],
+    "18.1 Rename `src/utils/api.js` → `src/utils/api.ts`; add typed parameters and `Promise<T>` return types for every exported function using types from `src/types.ts`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627489
+      }
+    ],
+    "18.2 Rename `src/context/cartContextValue.js` → `src/context/cartContextValue.ts`; export `CartContextValue` interface listing all 13 context fields; update `createContext` call to `createContext<CartContextValue | undefined>(undefined)`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627544
+      }
+    ],
+    "18.3 Rename `src/context/useCart.js` → `src/context/useCart.ts`; narrow return type to `CartContextValue`; throw `Error('useCart must be used within CartProvider')` when context is `undefined`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627589
+      }
+    ],
+    "18.4 Rename `src/context/CartContext.jsx` → `src/context/CartContext.tsx`; add explicit types to all state variables and function signatures; satisfy `CartContextValue` interface on the Provider value": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627640
+      }
+    ],
+    "19.1 Rename `src/components/SearchBar.jsx` → `src/components/SearchBar.tsx`; add `SearchBarProps` interface (`searchTerm: string`, `onSearchChange: (value: string) => void`)": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627714
+      }
+    ],
+    "19.2 Rename `src/components/CategoryFilter.jsx` → `src/components/CategoryFilter.tsx`; add `CategoryFilterProps` interface using `CategoryName` from `src/types.ts`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627755
+      }
+    ],
+    "19.3 Rename `src/components/ProductCard.jsx` → `src/components/ProductCard.tsx`; add `ProductCardProps` interface using `Product` from `src/types.ts`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627803
+      }
+    ],
+    "19.4 Rename `src/components/Navbar.jsx` → `src/components/Navbar.tsx`; no props needed; ensure `useCart()` return type resolves without errors": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627846
+      }
+    ],
+    "19.5 Rename remaining component files: `FadeIn.jsx` → `FadeIn.tsx` (add `FadeInProps`), `Footer.jsx` → `Footer.tsx`, `Hero.jsx` → `Hero.tsx`, `Loader.jsx` → `Loader.tsx`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627893
+      }
+    ],
+    "20.1 Rename `src/pages/Products.jsx` → `src/pages/Products.tsx`; add local types for state variables; use `ProductQuery`, `ProductsResponse`, `Pagination` from `src/types.ts`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627943
+      }
+    ],
+    "20.2 Rename `src/pages/Cart.jsx` → `src/pages/Cart.tsx`; type all variables using `CartItem`, `CartData` from `src/types.ts`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069627997
+      }
+    ],
+    "20.3 Rename `src/pages/Checkout.jsx` → `src/pages/Checkout.tsx`; type form state with `CheckoutCustomer`; type `order` state with `Order | null`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628057
+      }
+    ],
+    "20.4 Rename `src/pages/Home.jsx` → `src/pages/Home.tsx` and `src/pages/ProductDetails.jsx` → `src/pages/ProductDetails.tsx`; add appropriate prop and state types": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628105
+      }
+    ],
+    "21.1 Rename `src/App.jsx` → `src/App.tsx` and `src/main.jsx` → `src/main.tsx`; fix any strict-mode errors": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628164
+      }
+    ],
+    "22. Verify Frontend compiles with no TypeScript errors": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628221
+      }
+    ],
+    "23.1 Add `@import` JSDoc tags for Express and Prisma types to `backend/src/controllers/productController.js`; annotate `formatProduct` (`@typedef FormattedProduct`), `errorResponse`, `parsePositiveInt`, and all five exported controllers with `@param`/`@returns`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628276
+      }
+    ],
+    "23.2 Add equivalent JSDoc to `backend/src/controllers/categoryController.js` — `@typedef FormattedCategory` if needed, annotate all five controllers": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628326
+      }
+    ],
+    "23.3 Add JSDoc to `backend/src/controllers/cartController.js` — `@typedef FormattedCartResponse`, `@typedef FormattedCartItem`; annotate `formatCartResponse`, `getOrCreateCart`, and all five exported controllers": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628368
+      }
+    ],
+    "23.4 Add JSDoc to `backend/src/controllers/orderController.js` — annotate `CheckoutError` class (`@type {number}` on `statusCode`), `toNumber`, `formatOrderResponse`, `getCustomerDetails`, and `checkout`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628416
+      }
+    ],
+    "24.1 Create `src/__tests__/helpers.tsx` with `createCartContextValue` factory returning a fully-typed mock `CartContextValue` using `vi.fn()` stubs": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628461
+      }
+    ],
+    "24.2 Create `src/__tests__/Navbar.test.tsx`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628507
+      }
+    ],
+    "24.3 Create `src/__tests__/ProductCard.test.tsx`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628567
+      }
+    ],
+    "24.4 Create `src/__tests__/SearchBar.test.tsx`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628633
+      }
+    ],
+    "24.5 Create `src/__tests__/CategoryFilter.test.tsx`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628690
+      }
+    ],
+    "24.6 Create `src/__tests__/CartContext.test.tsx`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628742
+      }
+    ],
+    "25.1 Create `src/__tests__/api.test.ts`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628794
+      }
+    ],
+    "26. Final checkpoint — All tests passing": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069628840
+      }
+    ],
+    "4. Add Backend Vitest config": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069752654
+      }
+    ],
+    "5. Split `backend/src/server.js` into `app.js` + `server.js`": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069856217
+      }
+    ],
+    "6. Create Backend unit test Prisma mock setup": [
+      {
+        "executionId": "375c46e5-f0ad-427c-b09d-36b74c125403",
+        "chatSessionId": "sess_03460a01-634b-4732-8f8b-00b5e3f49d82",
+        "timestamp": 1789069923539
+      }
+    ]
+  }
+}

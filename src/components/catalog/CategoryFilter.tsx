@@ -1,4 +1,10 @@
-function CategoryFilter({ categories, selectedCategory, onSelectCategory }) {
+type CategoryFilterProps = {
+    categories: string[]
+    selectedCategory: string
+    onSelectCategory: (category: string) => void
+}
+
+function CategoryFilter({ categories, selectedCategory, onSelectCategory }: CategoryFilterProps) {
     return (
         <div className="mb-8 overflow-x-auto pb-2">
             <div className="flex gap-3 justify-center min-w-max px-4">

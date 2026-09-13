@@ -1,0 +1,566 @@
+{
+	"info": {
+		"name": "Nexora Store - Phase 7 (Orders & Checkout)",
+		"description": "Complete test collection for Phase 7 checkout functionality",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "cartId",
+			"value": "test-cart-{{$randomInt}}",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "0. Setup - Check Server",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/",
+					"host": ["{{baseUrl}}"]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1. Cart Setup",
+			"item": [
+				{
+					"name": "1.1 Create Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "{{cartId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.2 Add Product 1 (qty: 2)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "{{cartId}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.3 Add Product 2 (qty: 1)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "{{cartId}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 2,\n  \"quantity\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1.4 View Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "{{cartId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Checkout - Success",
+			"item": [
+				{
+					"name": "2.1 Valid Checkout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Order has ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.exist;",
+									"});",
+									"",
+									"pm.test(\"Status is PENDING\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.status).to.eql(\"PENDING\");",
+									"});",
+									"",
+									"pm.test(\"Has customer info\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.customer.name).to.eql(\"Ahmed Hassan\");",
+									"});",
+									"",
+									"pm.test(\"Tax is 10% of subtotal\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var expectedTax = Math.round(jsonData.subtotal * 0.10 * 100) / 100;",
+									"    pm.expect(jsonData.tax).to.eql(expectedTax);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "{{cartId}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Ahmed Hassan\",\n  \"customerEmail\": \"ahmed@test.com\",\n  \"customerPhone\": \"+201234567890\",\n  \"shippingAddress\": \"123 Main St, Cairo, Egypt\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2.2 Verify Cart Cleared",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Cart is empty\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.itemCount).to.eql(0);",
+									"    pm.expect(jsonData.total).to.eql(0);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "{{cartId}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/cart",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Validation Errors",
+			"item": [
+				{
+					"name": "3.1 Missing x-cart-id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions x-cart-id\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message).to.include(\"x-cart-id\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Ahmed\",\n  \"customerEmail\": \"ahmed@test.com\",\n  \"customerPhone\": \"123\",\n  \"shippingAddress\": \"Cairo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.2 Invalid Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions email\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include(\"email\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "test-invalid-email",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Ahmed\",\n  \"customerEmail\": \"invalid-email\",\n  \"customerPhone\": \"123\",\n  \"shippingAddress\": \"Cairo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.3 Missing Required Fields",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions required fields\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include(\"required\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "test-missing-fields",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Ahmed\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3.4 Empty Cart",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"pm.test(\"Error message mentions empty\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.message.toLowerCase()).to.include(\"empty\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "empty-cart-{{$randomInt}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Ahmed Hassan\",\n  \"customerEmail\": \"ahmed@test.com\",\n  \"customerPhone\": \"+201234567890\",\n  \"shippingAddress\": \"123 Main St, Cairo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Financial Tests",
+			"item": [
+				{
+					"name": "4.1 Setup Cart (Subtotal < $100)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "finance-test-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 2,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.2 Checkout (Should have $10 shipping)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Shipping is $10 when subtotal < $100\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.subtotal < 100) {",
+									"        pm.expect(jsonData.shipping).to.eql(10);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "finance-test-1",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Finance Test\",\n  \"customerEmail\": \"finance@test.com\",\n  \"customerPhone\": \"123\",\n  \"shippingAddress\": \"Cairo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.3 Setup Cart (Subtotal >= $100)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "finance-test-2",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/cart/items",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "cart", "items"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4.4 Checkout (Should have FREE shipping)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Shipping is FREE when subtotal >= $100\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.subtotal >= 100) {",
+									"        pm.expect(jsonData.shipping).to.eql(0);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-cart-id",
+								"value": "finance-test-2",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerName\": \"Finance Test 2\",\n  \"customerEmail\": \"finance2@test.com\",\n  \"customerPhone\": \"123\",\n  \"shippingAddress\": \"Cairo\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/checkout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "checkout"]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

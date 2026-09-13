@@ -72,30 +72,19 @@ mini-ecommerce/
 │   └── vite.svg
 ├── src/
 │   ├── assets/          # Images, icons, fonts
-│   ├── components/      # Reusable components
-│   │   ├── Navbar.jsx
-│   │   ├── Footer.jsx
-│   │   ├── ProductCard.jsx
-│   │   ├── CartItem.jsx
-│   │   ├── Hero.jsx
-│   │   ├── CategoryFilter.jsx
-│   │   ├── SearchBar.jsx
-│   │   └── Loader.jsx
-│   ├── pages/          # Page components
-│   │   ├── Home.jsx
-│   │   ├── Products.jsx
-│   │   ├── ProductDetails.jsx
-│   │   └── Cart.jsx
-│   ├── context/        # React Context for state management
-│   │   └── CartContext.jsx
-│   ├── hooks/          # Custom hooks
-│   │   └── useFetch.js
-│   ├── utils/          # Helper functions
-│   │   └── api.js
-│   ├── App.jsx
-│   ├── App.css
-│   ├── index.css
-│   └── main.jsx
+│   ├── app/             # App shell, routes, and entry point
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── components/      # Shared UI grouped by responsibility
+│   │   ├── catalog/     # Product catalog UI
+│   │   ├── common/      # Loader and animation primitives
+│   │   └── layout/      # Navbar and Footer
+│   ├── features/cart/   # Cart context and cart hook
+│   ├── pages/           # Route-level TSX pages
+│   ├── services/        # Typed API client
+│   ├── types/           # Shared TypeScript domain types
+│   ├── utils/           # Small cross-feature helpers
+│   └── styles/          # Global CSS
 ├── .gitignore
 ├── package.json
 ├── vite.config.js

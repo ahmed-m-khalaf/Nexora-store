@@ -1,18 +1,21 @@
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/useCart'
+import type { Product } from '../../types'
+import { useCart } from '../../features/cart/useCart'
 
-function ProductCard({ product }) {
+type ProductCardProps = { product: Product }
+
+function ProductCard({ product }: ProductCardProps) {
     const { addToCart } = useCart()
     const [isAdded, setIsAdded] = useState(false)
 
-    const handleAddToCart = async (e) => {
+    const handleAddToCart = async (e: MouseEvent<HTMLButtonElement>) => {
         e.preventDefault() // Prevent navigation if clicked inside Link
         try {
             await addToCart(product.id)
             setIsAdded(true)
             setTimeout(() => setIsAdded(false), 1500)
-        } catch (err) {
+        } catch (err: unknown) {
             console.error('Failed to add product to cart:', err)
         }
     }
@@ -33,12 +36,12 @@ function ProductCard({ product }) {
                     </h3>
                 </Link>
                 <p className="text-2xl font-bold text-primary-600 mb-3">
-                    ${product?.price || '0.00'}
+                    ${product.price.toFixed(2)}
                 </p>
                 <div className="flex items-center gap-2 mb-4">
                     <span className="text-yellow-500">⭐</span>
                     <span className="text-gray-600 text-sm">
-                        {product?.rating?.rate || '0'} ({product?.rating?.count || '0'})
+                        {product.rating.rate.toFixed(1)} ({product.rating.count})
                     </span>
                 </div>
                 <div className="flex gap-2 mt-auto">

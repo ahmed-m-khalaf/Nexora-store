@@ -1,23 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type MouseEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { api } from '../utils/api'
-import { useCart } from '../context/useCart'
-import Loader from '../components/Loader'
-import FadeIn from '../components/FadeIn'
+import { api } from '../services/api'
+import { useCart } from '../features/cart/useCart'
+import FadeIn from '../components/common/FadeIn'
+import Loader from '../components/common/Loader'
+import type { Product } from '../types'
 
 function ProductDetails() {
   const { id } = useParams()
   const { addToCart } = useCart()
-  const [product, setProduct] = useState(null)
+  const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true)
-        const data = await api.getProductById(id)
+        if (!id) {
+          setError('Invalid product ID.')
+          return
+        }
+        const data = await api.getProductById(Number(id))
         setProduct(data)
       } catch {
         setError('Failed to load product details.')
@@ -26,10 +31,12 @@ function ProductDetails() {
       }
     }
 
-    fetchProduct()
+    void fetchProduct()
   }, [id])
 
-  const handleAddToCart = async (e) => {
+  const handleAddToCart = async (e: MouseEvent<HTMLButtonElement>) => {
+    if (!product) return
+
     try {
       await addToCart(product.id, quantity)
 
@@ -45,8 +52,8 @@ function ProductDetails() {
           btn.classList.add('bg-primary-600', 'hover:bg-primary-700')
         }, 1500)
       }
-    } catch (err) {
-      console.error('Failed to add to cart:', err)
+    } catch (addError: unknown) {
+      console.error('Failed to add to cart:', addError)
     }
   }
 
@@ -77,11 +84,11 @@ function ProductDetails() {
               {product.category}
             </span>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.title}</h1>
-            <p className="text-4xl font-bold text-primary-600 mb-6">${product.price}</p>
+            <p className="text-4xl font-bold text-primary-600 mb-6">${product.price.toFixed(2)}</p>
 
             <div className="flex items-center gap-2 mb-6">
               <span className="text-yellow-500 text-xl">⭐</span>
-              <span className="font-medium text-gray-900">{product.rating.rate}</span>
+              <span className="font-medium text-gray-900">{product.rating.rate.toFixed(1)}</span>
               <span className="text-gray-500">({product.rating.count} reviews)</span>
             </div>
 

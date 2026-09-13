@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 
-function FadeIn({ children, delay = 0 }) {
+type FadeInProps = PropsWithChildren<{ delay?: number }>
+
+function FadeIn({ children, delay = 0 }: FadeInProps) {
     const [isVisible, setIsVisible] = useState(false)
 
     useEffect(() => {

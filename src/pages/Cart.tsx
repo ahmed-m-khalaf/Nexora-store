@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useCart } from '../context/useCart'
-import FadeIn from '../components/FadeIn'
-import Loader from '../components/Loader'
+import { useCart } from '../features/cart/useCart'
+import FadeIn from '../components/common/FadeIn'
+import Loader from '../components/common/Loader'
 
 function Cart() {
     const { cart, cartData, loading, error, clearCart, removeFromCart, updateQuantity } = useCart()

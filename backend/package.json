@@ -9,7 +9,8 @@
     "test": "node tests/api.test.js",
     "test:cart": "node tests/cart.test.js",
     "test:orders": "node tests/order.test.js",
-    "test:all": "node tests/run-all.js"
+    "test:all": "node tests/run-all.js",
+    "test:unit": "vitest run --config vitest.config.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -17,7 +18,8 @@
     "express": "^4.21.2"
   },
   "devDependencies": {
-    "prisma": "^6.19.3"
+    "prisma": "^6.19.3",
+    "vitest": "^5.0.0"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

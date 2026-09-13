@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { useCart } from '../context/useCart'
-import FadeIn from '../components/FadeIn'
-import Loader from '../components/Loader'
+import { useCart } from '../features/cart/useCart'
+import FadeIn from '../components/common/FadeIn'
+import Loader from '../components/common/Loader'
+import type { CheckoutCustomer, Order } from '../types'
+import { getErrorMessage } from '../utils/errors'
 
-const emptyForm = {
+const emptyForm: CheckoutCustomer = {
     customerName: '',
     customerEmail: '',
     customerPhone: '',
@@ -16,14 +18,14 @@ function Checkout() {
     const [form, setForm] = useState(emptyForm)
     const [submitting, setSubmitting] = useState(false)
     const [submitError, setSubmitError] = useState('')
-    const [order, setOrder] = useState(null)
+    const [order, setOrder] = useState<Order | null>(null)
 
-    const handleChange = (event) => {
+    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target
         setForm((current) => ({ ...current, [name]: value }))
     }
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         setSubmitting(true)
         setSubmitError('')
@@ -31,8 +33,8 @@ function Checkout() {
         try {
             const placedOrder = await checkout(form)
             setOrder(placedOrder)
-        } catch (err) {
-            setSubmitError(err.message || 'We could not place your order. Please try again.')
+        } catch (submitError: unknown) {
+            setSubmitError(getErrorMessage(submitError, 'We could not place your order. Please try again.'))
         } finally {
             setSubmitting(false)
         }
@@ -94,7 +96,7 @@ function Checkout() {
                         </label>
                         <label className="block text-sm font-medium text-gray-700">
                             Shipping address
-                            <textarea required name="shippingAddress" value={form.shippingAddress} onChange={handleChange} rows="4" className="mt-1 w-full resize-y rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-primary-600" />
+                        <textarea required name="shippingAddress" value={form.shippingAddress} onChange={handleChange} rows={4} className="mt-1 w-full resize-y rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-primary-600" />
                         </label>
                     </div>
                     {submitError && <p className="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700">{submitError}</p>}

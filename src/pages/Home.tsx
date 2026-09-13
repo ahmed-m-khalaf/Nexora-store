@@ -1,16 +1,18 @@
-import { useState, useEffect } from 'react'
-import { api } from '../utils/api'
-import Hero from '../components/Hero'
-import ProductCard from '../components/ProductCard'
-import Loader from '../components/Loader'
-import FadeIn from '../components/FadeIn'
+import { useCallback, useEffect, useState } from 'react'
+import { api } from '../services/api'
+import Hero from '../components/catalog/Hero'
+import ProductCard from '../components/catalog/ProductCard'
+import FadeIn from '../components/common/FadeIn'
+import Loader from '../components/common/Loader'
+import type { Product } from '../types'
+import { getErrorMessage } from '../utils/errors'
 
 function Home() {
-    const [products, setProducts] = useState([])
+    const [products, setProducts] = useState<Product[]>([])
     const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const [error, setError] = useState<string | null>(null)
 
-    const fetchFeaturedProducts = async () => {
+    const fetchFeaturedProducts = useCallback(async () => {
         try {
             setLoading(true)
             setError(null)
@@ -20,17 +22,17 @@ function Home() {
                 .sort((a, b) => b.rating.rate - a.rating.rate)
                 .slice(0, 4)
             setProducts(topProducts)
-        } catch (err) {
-            setError(err.message || 'Failed to fetch products')
-            console.error('Failed to fetch products:', err)
+        } catch (fetchError: unknown) {
+            setError(getErrorMessage(fetchError, 'Failed to fetch products'))
+            console.error('Failed to fetch products:', fetchError)
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
 
     useEffect(() => {
         fetchFeaturedProducts()
-    }, [])
+    }, [fetchFeaturedProducts])
 
     return (
         <FadeIn>

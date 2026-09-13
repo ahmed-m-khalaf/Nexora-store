@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { CartProvider } from './context/CartContext'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
-import Home from './pages/Home'
-import Products from './pages/Products'
-import ProductDetails from './pages/ProductDetails'
-import Cart from './pages/Cart'
-import Checkout from './pages/Checkout'
-import './App.css'
+import { CartProvider } from '../features/cart/CartContext'
+import Footer from '../components/layout/Footer'
+import Navbar from '../components/layout/Navbar'
+import Cart from '../pages/Cart'
+import Checkout from '../pages/Checkout'
+import Home from '../pages/Home'
+import ProductDetails from '../pages/ProductDetails'
+import Products from '../pages/Products'
+import '../styles/app.css'
 
-function App() {
+export default function App() {
   return (
     <CartProvider>
       <BrowserRouter>
@@ -30,7 +30,3 @@ function App() {
     </CartProvider>
   )
 }
-
-export default App
-
-
