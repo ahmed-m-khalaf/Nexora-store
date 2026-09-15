@@ -3,6 +3,7 @@ import { api } from '../../services/api'
 import type { CartContextValue, CartData, CartProductInput, CheckoutCustomer } from '../../types'
 import { getErrorMessage } from '../../utils/errors'
 import { CartContext } from './cartContextValue'
+import { useAuth } from '../auth/useAuth'
 
 const EMPTY_CART: CartData = {
     id: '', items: [], itemCount: 0, subtotal: 0, tax: 0, shipping: 0, total: 0,
@@ -20,10 +21,12 @@ function getOrCreateGuestCartId(): string {
 }
 
 export function CartProvider({ children }: PropsWithChildren) {
+    const { user } = useAuth()
     const [cartData, setCartData] = useState<CartData>(EMPTY_CART)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const [cartId] = useState<string>(getOrCreateGuestCartId)
+    const [guestCartId] = useState<string>(getOrCreateGuestCartId)
+    const cartId = user?.cartId || guestCartId
 
     const loadCart = useCallback(async () => {
         try {
@@ -31,13 +34,13 @@ export function CartProvider({ children }: PropsWithChildren) {
             setError(null)
             const data = await api.getCart(cartId)
             setCartData(data)
-            if (data.id && data.id !== cartId) localStorage.setItem('nexora_cart_id', data.id)
+            if (!user && data.id && data.id !== cartId) localStorage.setItem('nexora_cart_id', data.id)
         } catch (loadError) {
             setError(getErrorMessage(loadError, 'Failed to load cart'))
         } finally {
             setLoading(false)
         }
-    }, [cartId])
+    }, [cartId, user])
 
     useEffect(() => { void loadCart() }, [loadCart])
 

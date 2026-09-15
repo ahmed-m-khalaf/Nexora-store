@@ -1,10 +1,17 @@
 import prisma from '../lib/prisma.js';
 
-// Standardized error response
 const errorResponse = (res, status, message) =>
   res.status(status).json({ error: true, message, status });
 
-// Calculate cart totals & format output
+const cartInclude = {
+  items: {
+    include: { product: { include: { category: true } } },
+    orderBy: { createdAt: 'asc' },
+  },
+};
+
+const getGuestCartId = (req) => req.headers['x-cart-id'] || req.query.cartId;
+
 const formatCartResponse = (cart) => {
   const items = (cart.items || []).map((item) => {
     const price = typeof item.product.price === 'object'
@@ -21,16 +28,15 @@ const formatCartResponse = (cart) => {
         price,
         image: item.product.image,
         category: item.product.category ? item.product.category.name : '',
+        stock: item.product.stock,
       },
       quantity: item.quantity,
       subtotal: itemSubtotal,
     };
   });
 
-  const subtotal = parseFloat(
-    items.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2)
-  );
-  const tax = parseFloat((subtotal * 0.10).toFixed(2)); // 10% tax
+  const subtotal = parseFloat(items.reduce((sum, item) => sum + item.subtotal, 0).toFixed(2));
+  const tax = parseFloat((subtotal * 0.10).toFixed(2));
   const shipping = subtotal > 0 && subtotal < 100 ? 10.00 : 0.00;
   const total = parseFloat((subtotal + tax + shipping).toFixed(2));
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -47,264 +53,142 @@ const formatCartResponse = (cart) => {
   };
 };
 
-// Helper: Get existing cart or create a new one
-const getOrCreateCart = async (cartId) => {
-  if (cartId && typeof cartId === 'string' && cartId.trim()) {
-    const existing = await prisma.cart.findUnique({
-      where: { id: cartId.trim() },
-      include: {
-        items: {
-          include: { product: { include: { category: true } } },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-    });
-    if (existing) return existing;
-
-    // Create cart with explicit ID if valid string
-    return prisma.cart.create({
-      data: { id: cartId.trim() },
-      include: {
-        items: {
-          include: { product: { include: { category: true } } },
-        },
-      },
-    });
+const getOrCreateGuestCart = async (cartId) => {
+  const normalizedId = typeof cartId === 'string' ? cartId.trim() : '';
+  if (normalizedId) {
+    const existing = await prisma.cart.findUnique({ where: { id: normalizedId }, include: cartInclude });
+    if (existing) {
+      if (existing.userId) {
+        const error = new Error('This cart belongs to an authenticated user.');
+        error.statusCode = 403;
+        throw error;
+      }
+      return existing;
+    }
+    return prisma.cart.create({ data: { id: normalizedId }, include: cartInclude });
   }
-
-  // Create new cart with auto UUID
-  return prisma.cart.create({
-    data: {},
-    include: {
-      items: {
-        include: { product: { include: { category: true } } },
-      },
-    },
-  });
+  return prisma.cart.create({ data: {}, include: cartInclude });
 };
 
-// GET /api/cart
+const getUserCart = async (userId) => {
+  const existing = await prisma.cart.findUnique({ where: { userId }, include: cartInclude });
+  if (existing) return existing;
+  return prisma.cart.create({ data: { userId }, include: cartInclude });
+};
+
+const getRequestCart = async (req) => {
+  if (req.user) return getUserCart(req.user.id);
+  return getOrCreateGuestCart(getGuestCartId(req));
+};
+
+const refetchCart = (cartId) => prisma.cart.findUnique({
+  where: { id: cartId },
+  include: cartInclude,
+});
+
+const requireGuestCartIdForMutation = (req, res) => {
+  if (!req.user && !getGuestCartId(req)) {
+    errorResponse(res, 400, 'x-cart-id header or cartId query param is required.');
+    return false;
+  }
+  return true;
+};
+
 export const getCart = async (req, res, next) => {
   try {
-    const cartId = req.headers['x-cart-id'] || req.query.cartId;
-    const cart = await getOrCreateCart(cartId);
+    const cart = await getRequestCart(req);
     res.status(200).json(formatCartResponse(cart));
   } catch (error) {
     next(error);
   }
 };
 
-// POST /api/cart/items
 export const addToCart = async (req, res, next) => {
   try {
-    const cartId = req.headers['x-cart-id'] || req.query.cartId;
-    const { productId, quantity = 1 } = req.body;
+    const parsedProductId = Number.parseInt(req.body.productId, 10);
+    const parsedQuantity = Number.parseInt(req.body.quantity ?? 1, 10);
 
-    const parsedProductId = parseInt(productId, 10);
-    const parsedQuantity = parseInt(quantity, 10);
-
-    if (isNaN(parsedProductId) || parsedProductId < 1) {
+    if (!Number.isInteger(parsedProductId) || parsedProductId < 1) {
       return errorResponse(res, 400, 'Invalid productId. Must be a positive integer.');
     }
-    if (isNaN(parsedQuantity) || parsedQuantity < 1) {
+    if (!Number.isInteger(parsedQuantity) || parsedQuantity < 1) {
       return errorResponse(res, 400, 'Invalid quantity. Must be a positive integer.');
     }
 
-    // Verify product exists
-    const product = await prisma.product.findUnique({
-      where: { id: parsedProductId },
-    });
-    if (!product) {
-      return errorResponse(res, 404, `Product with ID ${parsedProductId} not found.`);
-    }
+    const product = await prisma.product.findUnique({ where: { id: parsedProductId } });
+    if (!product) return errorResponse(res, 404, `Product with ID ${parsedProductId} not found.`);
 
-    const cart = await getOrCreateCart(cartId);
+    const cart = await getRequestCart(req);
 
-    // Upsert cart item
     await prisma.cartItem.upsert({
-      where: {
-        cartId_productId: {
-          cartId: cart.id,
-          productId: parsedProductId,
-        },
-      },
-      update: {
-        quantity: { increment: parsedQuantity },
-      },
-      create: {
-        cartId: cart.id,
-        productId: parsedProductId,
-        quantity: parsedQuantity,
-      },
+      where: { cartId_productId: { cartId: cart.id, productId: parsedProductId } },
+      update: { quantity: { increment: parsedQuantity } },
+      create: { cartId: cart.id, productId: parsedProductId, quantity: parsedQuantity },
     });
 
-    // Re-fetch updated cart
-    const updatedCart = await prisma.cart.findUnique({
-      where: { id: cart.id },
-      include: {
-        items: {
-          include: { product: { include: { category: true } } },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-    });
-
-    res.status(200).json(formatCartResponse(updatedCart));
+    res.status(200).json(formatCartResponse(await refetchCart(cart.id)));
   } catch (error) {
     next(error);
   }
 };
 
-// PATCH /api/cart/items/:productId
 export const updateCartItem = async (req, res, next) => {
   try {
-    const cartId = req.headers['x-cart-id'] || req.query.cartId;
-    const parsedProductId = parseInt(req.params.productId, 10);
-    const { quantity } = req.body;
-
-    if (isNaN(parsedProductId) || parsedProductId < 1) {
+    if (!requireGuestCartIdForMutation(req, res)) return;
+    const parsedProductId = Number.parseInt(req.params.productId, 10);
+    const parsedQuantity = Number.parseInt(req.body.quantity, 10);
+    if (!Number.isInteger(parsedProductId) || parsedProductId < 1) {
       return errorResponse(res, 400, 'Invalid productId. Must be a positive integer.');
     }
-
-    const parsedQuantity = parseInt(quantity, 10);
-    if (isNaN(parsedQuantity)) {
+    if (!Number.isInteger(parsedQuantity)) {
       return errorResponse(res, 400, 'Quantity is required and must be an integer.');
     }
 
-    if (!cartId) {
-      return errorResponse(res, 400, 'x-cart-id header or cartId query param is required.');
-    }
-
-    const cart = await prisma.cart.findUnique({
-      where: { id: cartId },
+    const cart = await getRequestCart(req);
+    const existingItem = await prisma.cartItem.findUnique({
+      where: { cartId_productId: { cartId: cart.id, productId: parsedProductId } },
     });
-    if (!cart) {
-      return errorResponse(res, 404, 'Cart not found.');
+    if (parsedQuantity > 0 && !existingItem) {
+      return errorResponse(res, 404, `Item with product ID ${parsedProductId} is not in the cart.`);
     }
 
     if (parsedQuantity <= 0) {
-      // Delete item if quantity <= 0
-      await prisma.cartItem.deleteMany({
-        where: {
-          cartId: cart.id,
-          productId: parsedProductId,
-        },
-      });
+      await prisma.cartItem.deleteMany({ where: { cartId: cart.id, productId: parsedProductId } });
     } else {
-      // Check if item exists in cart
-      const existingItem = await prisma.cartItem.findUnique({
-        where: {
-          cartId_productId: {
-            cartId: cart.id,
-            productId: parsedProductId,
-          },
-        },
-      });
-
-      if (!existingItem) {
-        return errorResponse(res, 404, `Item with product ID ${parsedProductId} is not in the cart.`);
-      }
-
       await prisma.cartItem.update({
-        where: {
-          cartId_productId: {
-            cartId: cart.id,
-            productId: parsedProductId,
-          },
-        },
+        where: { cartId_productId: { cartId: cart.id, productId: parsedProductId } },
         data: { quantity: parsedQuantity },
       });
     }
 
-    const updatedCart = await prisma.cart.findUnique({
-      where: { id: cart.id },
-      include: {
-        items: {
-          include: { product: { include: { category: true } } },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-    });
-
-    res.status(200).json(formatCartResponse(updatedCart));
+    res.status(200).json(formatCartResponse(await refetchCart(cart.id)));
   } catch (error) {
     next(error);
   }
 };
 
-// DELETE /api/cart/items/:productId
 export const removeCartItem = async (req, res, next) => {
   try {
-    const cartId = req.headers['x-cart-id'] || req.query.cartId;
-    const parsedProductId = parseInt(req.params.productId, 10);
-
-    if (isNaN(parsedProductId) || parsedProductId < 1) {
+    if (!requireGuestCartIdForMutation(req, res)) return;
+    const parsedProductId = Number.parseInt(req.params.productId, 10);
+    if (!Number.isInteger(parsedProductId) || parsedProductId < 1) {
       return errorResponse(res, 400, 'Invalid productId. Must be a positive integer.');
     }
-    if (!cartId) {
-      return errorResponse(res, 400, 'x-cart-id header or cartId query param is required.');
-    }
 
-    const cart = await prisma.cart.findUnique({
-      where: { id: cartId },
-    });
-    if (!cart) {
-      return errorResponse(res, 404, 'Cart not found.');
-    }
-
-    await prisma.cartItem.deleteMany({
-      where: {
-        cartId: cart.id,
-        productId: parsedProductId,
-      },
-    });
-
-    const updatedCart = await prisma.cart.findUnique({
-      where: { id: cart.id },
-      include: {
-        items: {
-          include: { product: { include: { category: true } } },
-          orderBy: { createdAt: 'asc' },
-        },
-      },
-    });
-
-    res.status(200).json(formatCartResponse(updatedCart));
+    const cart = await getRequestCart(req);
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id, productId: parsedProductId } });
+    res.status(200).json(formatCartResponse(await refetchCart(cart.id)));
   } catch (error) {
     next(error);
   }
 };
 
-// DELETE /api/cart
 export const clearCart = async (req, res, next) => {
   try {
-    const cartId = req.headers['x-cart-id'] || req.query.cartId;
-    if (!cartId) {
-      return errorResponse(res, 400, 'x-cart-id header or cartId query param is required.');
-    }
-
-    const cart = await prisma.cart.findUnique({
-      where: { id: cartId },
-    });
-
-    if (cart) {
-      await prisma.cartItem.deleteMany({
-        where: { cartId: cart.id },
-      });
-    }
-
-    const emptyCart = cart || await getOrCreateCart(cartId);
-
-    const reFetched = await prisma.cart.findUnique({
-      where: { id: emptyCart.id },
-      include: {
-        items: {
-          include: { product: { include: { category: true } } },
-        },
-      },
-    });
-
-    res.status(200).json(formatCartResponse(reFetched));
+    if (!requireGuestCartIdForMutation(req, res)) return;
+    const cart = await getRequestCart(req);
+    await prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
+    res.status(200).json(formatCartResponse(await refetchCart(cart.id)));
   } catch (error) {
     next(error);
   }

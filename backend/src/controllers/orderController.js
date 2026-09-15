@@ -6,6 +6,7 @@ export const checkout = async (req, res, next) => {
   try {
     const order = await checkoutCart({
       cartId: req.headers['x-cart-id'],
+      userId: req.user?.id,
       customer: req.body,
     });
     res.status(201).json(order);

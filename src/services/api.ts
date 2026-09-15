@@ -2,28 +2,42 @@ import type {
     ApiClient,
     CartData,
     CheckoutCustomer,
+    AuthCredentials,
+    AuthResponse,
     Order,
     Product,
     ProductQuery,
     ProductsResponse,
+    RegisterInput,
+    User,
 } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const TOKEN_KEY = 'nexora_access_token'
+
+export const getStoredToken = () => localStorage.getItem(TOKEN_KEY)
+export const setStoredToken = (token: string) => localStorage.setItem(TOKEN_KEY, token)
+export const clearStoredToken = () => localStorage.removeItem(TOKEN_KEY)
 
 async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
     let response: Response
 
     try {
-        const headers = {
+        const token = getStoredToken()
+        const headers: HeadersInit = {
             'Content-Type': 'application/json',
             ...options.headers,
         }
+        if (token) (headers as Record<string, string>).Authorization = `Bearer ${token}`
         response = await fetch(url, { ...options, headers })
     } catch {
         throw new Error('Network error. Please check your connection and try again.')
     }
 
     if (!response.ok) {
+        if (response.status === 401) {
+            clearStoredToken()
+        }
         const errorData = await response.json().catch(() => null) as { message?: string } | null
         const message = errorData?.message || `Request failed with status ${response.status}`
         const error = new Error(message) as Error & { status?: number }
@@ -81,4 +95,15 @@ export const api: ApiClient = {
         headers: cartId ? { 'x-cart-id': cartId } : {},
         body: JSON.stringify(customer),
     }),
+    register: (input: RegisterInput, guestCartId = '') => apiFetch<AuthResponse>(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: guestCartId ? { 'x-cart-id': guestCartId } : {},
+        body: JSON.stringify(input),
+    }),
+    login: (input: AuthCredentials, guestCartId = '') => apiFetch<AuthResponse>(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: guestCartId ? { 'x-cart-id': guestCartId } : {},
+        body: JSON.stringify(input),
+    }),
+    getCurrentUser: () => apiFetch<{ user: User }>(`${API_BASE_URL}/auth/me`),
 }

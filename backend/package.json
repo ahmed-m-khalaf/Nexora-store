@@ -9,13 +9,17 @@
     "test": "node tests/api.test.js",
     "test:cart": "node tests/cart.test.js",
     "test:orders": "node tests/order.test.js",
+    "test:auth": "node tests/auth.test.js",
     "test:all": "node tests/run-all.js",
-    "test:unit": "vitest run --config vitest.config.js"
+    "test:unit": "vitest run --config vitest.config.js",
+    "db:seed:catalog": "node prisma/seedCatalog.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "prisma": "^6.19.3",

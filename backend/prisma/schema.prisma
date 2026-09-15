@@ -20,16 +20,16 @@ model Category {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   title       String
-  price       Decimal  @db.Decimal(10, 2)
+  price       Decimal     @db.Decimal(10, 2)
   description String
   image       String
   categoryId  Int
-  stock       Int      @default(10)
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  stock       Int         @default(10)
+  category    Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   cartItems   CartItem[]
   orderItems  OrderItem[]
 
@@ -38,9 +38,29 @@ model Product {
   @@index([title])
 }
 
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         UserRole @default(CUSTOMER)
+  cart         Cart?
+  orders       Order[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([role])
+}
+
 model Cart {
   id        String     @id @default(uuid())
   userId    Int?       @unique
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
   items     CartItem[]
   orders    Order[]
   createdAt DateTime   @default(now())
@@ -59,7 +79,9 @@ enum OrderStatus {
 model Order {
   id              String      @id @default(uuid())
   cartId          String
+  userId          Int?
   cart            Cart        @relation(fields: [cartId], references: [id])
+  user            User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
   customerName    String
   customerEmail   String
   customerPhone   String
@@ -74,6 +96,7 @@ model Order {
   updatedAt       DateTime    @updatedAt
 
   @@index([cartId])
+  @@index([userId])
   @@index([status])
 }
 

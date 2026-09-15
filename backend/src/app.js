@@ -4,6 +4,7 @@ import productRoutes from './routes/productRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
       categories: '/api/categories',
       cart: '/api/cart',
       orders: '/api/orders',
+      auth: '/api/auth',
     },
   });
 });
@@ -38,6 +40,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/auth', authRoutes);
 
 // Fallback Route (404 for unknown endpoints)
 app.use((req, res) => {

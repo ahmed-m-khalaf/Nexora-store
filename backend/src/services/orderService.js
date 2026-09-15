@@ -80,9 +80,9 @@ const buildOrderItems = (cartItems) => cartItems.map((cartItem) => {
   };
 });
 
-const createOrderInTransaction = async (tx, cartId, customer) => {
+const createOrderInTransaction = async (tx, { cartId, userId }, customer) => {
   const cart = await tx.cart.findUnique({
-    where: { id: cartId },
+    where: userId ? { userId } : { id: cartId },
     include: {
       items: {
         include: { product: true },
@@ -92,6 +92,9 @@ const createOrderInTransaction = async (tx, cartId, customer) => {
   });
 
   if (!cart) throw new CheckoutError(404, 'Cart not found.');
+  if (!userId && cart.userId) {
+    throw new CheckoutError(403, 'This cart belongs to an authenticated user.');
+  }
   if (cart.items.length === 0) throw new CheckoutError(400, 'Cannot checkout an empty cart.');
 
   const orderItems = buildOrderItems(cart.items);
@@ -111,6 +114,7 @@ const createOrderInTransaction = async (tx, cartId, customer) => {
   const order = await tx.order.create({
     data: {
       cartId: cart.id,
+      userId: userId || null,
       ...customer,
       ...totals,
       items: { create: orderItems },
@@ -148,9 +152,9 @@ export const formatOrderResponse = (order) => ({
   createdAt: order.createdAt,
 });
 
-export const checkoutCart = async ({ cartId, customer, db = prisma }) => {
+export const checkoutCart = async ({ cartId, userId, customer, db = prisma }) => {
   const normalizedCartId = normalizeCartId(cartId);
-  if (!normalizedCartId) {
+  if (!userId && !normalizedCartId) {
     throw new CheckoutError(400, 'x-cart-id header is required to place an order.');
   }
 
@@ -159,7 +163,7 @@ export const checkoutCart = async ({ cartId, customer, db = prisma }) => {
   for (let attempt = 1; attempt <= MAX_TRANSACTION_RETRIES; attempt += 1) {
     try {
       const order = await db.$transaction(
-        (tx) => createOrderInTransaction(tx, normalizedCartId, customerDetails),
+        (tx) => createOrderInTransaction(tx, { cartId: normalizedCartId, userId }, customerDetails),
         { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
       );
 

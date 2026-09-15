@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaInstagram, FaFacebook, FaEnvelope, FaMapMarkerAlt, FaPhone } from "react-icons/fa";
+import { FiShoppingBag } from "react-icons/fi";
 
 function Footer() {
     return (
@@ -9,7 +10,12 @@ function Footer() {
 
                     {/* Brand Section */}
                     <div>
-                        <h3 className="text-2xl font-bold text-white mb-4">🛍️ Nexora Store</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white text-base">
+                                <FiShoppingBag className="h-4 w-4" />
+                            </span>
+                            <span>Nexora</span>
+                        </h3>
                         <p className="text-gray-400 mb-4 leading-relaxed">
                             Your one-stop destination for premium products. We bring quality and style right to your doorstep.
                         </p>

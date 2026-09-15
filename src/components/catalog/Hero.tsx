@@ -1,21 +1,73 @@
+import { useLayoutEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import gsap from 'gsap'
 
 function Hero() {
+    const ref = useRef<HTMLElement>(null)
+
+    useLayoutEffect(() => {
+        const element = ref.current
+        if (!element) return
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        const context = gsap.context(() => {
+            if (reducedMotion) {
+                gsap.set('.hero-piece', { autoAlpha: 1, y: 0, scale: 1 })
+                return
+            }
+
+            gsap.fromTo('.hero-piece',
+                { autoAlpha: 0, y: 22 },
+                { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out' },
+            )
+            gsap.to('.hero-orb', {
+                y: -16,
+                duration: 3.5,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+            })
+        }, ref)
+
+        return () => context.revert()
+    }, [])
+
     return (
-        <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-            <div className="container mx-auto px-4 text-center">
-                <h1 className="text-5xl font-bold mb-4">Welcome to Nexora Store</h1>
-                <p className="text-xl mb-8 text-primary-100">
-                    Discover amazing products at unbeatable prices
-                </p>
-                <Link
-                    to="/products"
-                    className="inline-block bg-white text-primary-600 font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition shadow-lg hover:shadow-xl"
-                >
-                    Shop Now →
-                </Link>
+        <section ref={ref} className="relative isolate overflow-hidden bg-slate-950 text-white">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.3),_transparent_40%),radial-gradient(circle_at_bottom_left,_rgba(20,184,166,0.18),_transparent_40%)]" />
+            <div className="hero-orb absolute -right-24 top-8 -z-0 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+            <div className="container relative z-10 mx-auto grid min-h-[520px] items-center gap-10 px-4 py-20 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="max-w-2xl">
+                    <span className="hero-piece mb-5 inline-flex rounded-full border border-cyan-300/30 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 backdrop-blur">
+                        Curated essentials · Designed for everyday
+                    </span>
+                    <h1 className="hero-piece text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">
+                        Better products for your next <span className="text-cyan-300">everyday.</span>
+                    </h1>
+                    <p className="hero-piece mt-6 max-w-xl text-lg leading-8 text-slate-300">
+                        Discover a focused collection of useful, beautiful pieces — selected to make work, travel, and life feel lighter.
+                    </p>
+                    <div className="hero-piece mt-8 flex flex-wrap gap-4">
+                        <Link to="/products" className="rounded-xl bg-cyan-400 px-6 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300">
+                            Explore collection <span aria-hidden="true">→</span>
+                        </Link>
+                        <Link to="/products?category=electronics" className="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-white/50 hover:bg-white/10">
+                            Shop tech
+                        </Link>
+                    </div>
+                </div>
+                <div className="hero-piece relative mx-auto w-full max-w-md">
+                    <div className="absolute -inset-6 rounded-[2rem] bg-cyan-400/20 blur-2xl" />
+                    <div className="relative rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl">
+                        <img src="/products/headphones.svg" alt="Featured wireless headphones" className="w-full rounded-2xl" />
+                        <div className="mt-4 flex items-center justify-between">
+                            <div><p className="text-sm text-slate-300">Featured pick</p><p className="font-bold">Pulse Wireless Headphones</p></div>
+                            <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-sm font-bold text-emerald-200">$89</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     )
 }
 

@@ -1,19 +1,43 @@
 import { Link, useNavigate } from 'react-router-dom'
+import { FiAlertCircle, FiRefreshCw, FiShoppingBag, FiArrowRight } from 'react-icons/fi'
 import { useCart } from '../features/cart/useCart'
 import FadeIn from '../components/common/FadeIn'
 import Loader from '../components/common/Loader'
 
 function Cart() {
-    const { cart, cartData, loading, error, clearCart, removeFromCart, updateQuantity } = useCart()
+    const { cart, cartData, loading, error, clearCart, removeFromCart, updateQuantity, loadCart } = useCart()
     const navigate = useNavigate()
 
     if (loading) return <Loader />
 
     if (error) {
         return (
-            <div className="container mx-auto px-4 py-12 text-center">
-                <p className="text-red-500 mb-4">{error}</p>
-            </div>
+            <FadeIn>
+                <div className="container mx-auto max-w-md px-4 py-20 text-center">
+                    <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 shadow-sm">
+                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100 text-red-600">
+                            <FiAlertCircle className="h-7 w-7" />
+                        </div>
+                        <h2 className="mb-2 text-xl font-bold text-slate-900">Unable to load your cart</h2>
+                        <p className="mb-6 text-sm text-slate-600">{error}</p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <button
+                                onClick={() => void loadCart()}
+                                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 active:scale-95"
+                            >
+                                <FiRefreshCw className="h-4 w-4" />
+                                <span>Try Again</span>
+                            </button>
+                            <Link
+                                to="/products"
+                                className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                            >
+                                <span>Explore Products</span>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </FadeIn>
         )
     }
 
@@ -21,14 +45,17 @@ function Cart() {
         return (
             <FadeIn>
                 <div className="container mx-auto px-4 py-24 text-center">
-                    <div className="mb-6 text-6xl">🛒</div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-                    <p className="text-gray-600 mb-8">Looks like you haven't added anything to your cart yet.</p>
+                    <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-slate-100 text-slate-400">
+                        <FiShoppingBag className="h-12 w-12" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-3">Your Cart is Empty</h1>
+                    <p className="text-gray-500 mb-8 max-w-sm mx-auto">Looks like you haven&apos;t added any items to your cart yet.</p>
                     <Link
                         to="/products"
-                        className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition shadow-md hover:shadow-lg"
+                        className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-8 rounded-lg transition shadow-md hover:shadow-lg"
                     >
-                        Start Shopping
+                        <span>Start Shopping</span>
+                        <FiArrowRight />
                     </Link>
                 </div>
             </FadeIn>

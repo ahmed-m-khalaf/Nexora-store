@@ -1,25 +1,32 @@
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { useLayoutEffect, useRef, type PropsWithChildren } from 'react'
+import gsap from 'gsap'
 
-type FadeInProps = PropsWithChildren<{ delay?: number }>
+type FadeInProps = PropsWithChildren<{ delay?: number; className?: string }>
 
-function FadeIn({ children, delay = 0 }: FadeInProps) {
-    const [isVisible, setIsVisible] = useState(false)
+function FadeIn({ children, delay = 0, className = '' }: FadeInProps) {
+    const ref = useRef<HTMLDivElement>(null)
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsVisible(true)
-        }, delay)
-        return () => clearTimeout(timer)
+    useLayoutEffect(() => {
+        const element = ref.current
+        if (!element) return
+
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        const context = gsap.context(() => {
+            if (reducedMotion) {
+                gsap.set(element, { autoAlpha: 1, y: 0 })
+                return
+            }
+
+            gsap.fromTo(element,
+                { autoAlpha: 0, y: 18 },
+                { autoAlpha: 1, y: 0, delay, duration: 0.55, ease: 'power3.out' },
+            )
+        }, ref)
+
+        return () => context.revert()
     }, [delay])
 
-    return (
-        <div
-            className={`transition-opacity duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                }`}
-        >
-            {children}
-        </div>
-    )
+    return <div ref={ref} className={className}>{children}</div>
 }
 
 export default FadeIn

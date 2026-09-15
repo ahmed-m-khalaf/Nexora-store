@@ -1,5 +1,6 @@
 import { useState, useEffect, type MouseEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { FiArrowLeft, FiCheck, FiChevronRight, FiMinus, FiPlus, FiShield, FiShoppingBag, FiStar, FiTruck } from 'react-icons/fi'
 import { api } from '../services/api'
 import { useCart } from '../features/cart/useCart'
 import FadeIn from '../components/common/FadeIn'
@@ -13,6 +14,8 @@ function ProductDetails() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [quantity, setQuantity] = useState(1)
+  const [addStatus, setAddStatus] = useState<'idle' | 'added' | 'error'>('idle')
+  const [addError, setAddError] = useState('')
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -35,25 +38,17 @@ function ProductDetails() {
   }, [id])
 
   const handleAddToCart = async (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
     if (!product) return
 
     try {
+      setAddError('')
       await addToCart(product.id, quantity)
-
-      const btn = e.currentTarget
-      if (btn) {
-        const originalText = btn.innerText
-        btn.innerText = 'Added to Cart! ✅'
-        btn.classList.add('bg-green-600')
-        btn.classList.remove('bg-primary-600', 'hover:bg-primary-700')
-        setTimeout(() => {
-          btn.innerText = originalText
-          btn.classList.remove('bg-green-600')
-          btn.classList.add('bg-primary-600', 'hover:bg-primary-700')
-        }, 1500)
-      }
+      setAddStatus('added')
+      window.setTimeout(() => setAddStatus('idle'), 1500)
     } catch (addError: unknown) {
-      console.error('Failed to add to cart:', addError)
+      setAddStatus('error')
+      setAddError(addError instanceof Error ? addError.message : 'Could not add this product.')
     }
   }
 
@@ -61,66 +56,112 @@ function ProductDetails() {
   if (error) return <div className="text-center text-red-500 py-12">{error}</div>
   if (!product) return <div className="text-center py-12">Product not found</div>
 
+  const stock = product.stock ?? 0
+  const isOutOfStock = stock <= 0
+  const isLowStock = stock > 0 && stock <= 5
+
   return (
     <FadeIn>
       <div className="container mx-auto px-4 py-8">
-        <Link to="/products" className="text-primary-600 hover:text-primary-700 mb-6 inline-block font-medium">
-          ← Back to Products
-        </Link>
+        {/* Breadcrumb Navigation */}
+        <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-sm text-slate-500">
+          <Link to="/" className="hover:text-primary-600 transition">Home</Link>
+          <FiChevronRight className="h-3.5 w-3.5" />
+          <Link to="/products" className="hover:text-primary-600 transition">Catalog</Link>
+          <FiChevronRight className="h-3.5 w-3.5" />
+          <span className="capitalize text-slate-700">{product.category}</span>
+          <FiChevronRight className="h-3.5 w-3.5 hidden sm:inline" />
+          <span className="truncate max-w-[200px] text-slate-400 hidden sm:inline">{product.title}</span>
+        </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 bg-white rounded-xl shadow-lg p-8">
-          {/* Product Image */}
-          <div className="flex items-center justify-center bg-white p-4">
+        <div className="grid grid-cols-1 gap-10 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:p-8 lg:grid-cols-2">
+          <div className="flex min-h-[420px] items-center justify-center rounded-lg bg-slate-50 p-6">
             <img
               src={product.image}
               alt={product.title}
-              className="max-h-[500px] object-contain"
+              onError={(event) => {
+                event.currentTarget.onerror = null
+                event.currentTarget.src = '/products/placeholder.svg'
+              }}
+              className="max-h-[480px] w-full object-contain transition-transform duration-300 hover:scale-105"
             />
           </div>
 
-          {/* Product Info */}
           <div>
-            <span className="inline-block bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-sm font-semibold mb-4 capitalize">
-              {product.category}
-            </span>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.title}</h1>
-            <p className="text-4xl font-bold text-primary-600 mb-6">${product.price.toFixed(2)}</p>
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="inline-block rounded-full bg-primary-50 px-3 py-1 text-sm font-semibold capitalize text-primary-700">
+                {product.category}
+              </span>
+              <span className={`inline-block rounded-full px-3 py-1 text-sm font-semibold ${
+                isOutOfStock ? 'bg-red-50 text-red-700' : isLowStock ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'
+              }`}>
+                {isOutOfStock ? 'Out of stock' : isLowStock ? `Only ${stock} left` : `${stock} in stock`}
+              </span>
+            </div>
+            <h1 className="mb-4 text-3xl font-bold leading-tight text-slate-900 md:text-4xl">{product.title}</h1>
+            <p className="mb-6 text-4xl font-bold text-primary-600">${product.price.toFixed(2)}</p>
 
             <div className="flex items-center gap-2 mb-6">
-              <span className="text-yellow-500 text-xl">⭐</span>
-              <span className="font-medium text-gray-900">{product.rating.rate.toFixed(1)}</span>
-              <span className="text-gray-500">({product.rating.count} reviews)</span>
+              <div className="flex items-center text-amber-400">
+                <FiStar className="h-5 w-5 fill-amber-400" aria-hidden="true" />
+              </div>
+              <span className="font-semibold text-slate-900">{product.rating.rate.toFixed(1)}</span>
+              <span className="text-slate-500">({product.rating.count} customer reviews)</span>
             </div>
 
             <p className="text-gray-600 mb-8 leading-relaxed">
               {product.description}
             </p>
 
+            <div className="mb-8 grid gap-3 sm:grid-cols-2">
+              <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                <FiTruck className="shrink-0 text-primary-600" aria-hidden />
+                Free shipping over $100
+              </div>
+              <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                <FiShield className="shrink-0 text-primary-600" aria-hidden />
+                Secure checkout
+              </div>
+            </div>
+
             <div className="border-t border-gray-100 pt-6">
-              <div className="flex items-center gap-4 mb-6">
-                <label className="text-gray-700 font-semibold">Quantity:</label>
-                <div className="flex items-center border border-gray-300 rounded-lg">
+              <div className="mb-6 flex flex-wrap items-center gap-4">
+                <label className="text-gray-700 font-semibold">Quantity</label>
+                <div className="flex items-center rounded-lg border border-gray-300">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-10 h-10 hover:bg-gray-100 transition flex items-center justify-center text-gray-600"
+                    disabled={quantity <= 1}
+                    className="flex h-10 w-10 items-center justify-center text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Decrease quantity"
                   >
-                    -
+                    <FiMinus aria-hidden />
                   </button>
                   <span className="w-12 text-center font-semibold">{quantity}</span>
                   <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-10 h-10 hover:bg-gray-100 transition flex items-center justify-center text-gray-600"
+                    onClick={() => setQuantity(Math.min(stock, quantity + 1))}
+                    disabled={isOutOfStock || quantity >= stock}
+                    className="flex h-10 w-10 items-center justify-center text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Increase quantity"
                   >
-                    +
+                    <FiPlus aria-hidden />
                   </button>
                 </div>
               </div>
 
+              {addStatus === 'error' && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{addError}</p>}
+
               <button
                 onClick={handleAddToCart}
-                className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 rounded-xl transition shadow-lg hover:shadow-xl active:scale-[0.99]"
+                disabled={isOutOfStock || addStatus === 'added'}
+                className={`flex w-full items-center justify-center gap-2 rounded-lg py-4 font-bold text-white shadow-md transition active:scale-[0.99] disabled:cursor-not-allowed ${
+                  addStatus === 'added'
+                    ? 'bg-emerald-600'
+                    : isOutOfStock
+                      ? 'bg-slate-300 text-slate-500'
+                      : 'bg-primary-600 hover:bg-primary-700'
+                }`}
               >
-                Add to Cart
+                {addStatus === 'added' ? <><FiCheck aria-hidden /> Added to cart</> : <><FiShoppingBag aria-hidden /> Add to Cart</>}
               </button>
             </div>
           </div>

@@ -67,6 +67,9 @@ Create `backend/.env`:
 
 ```env
 DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
+JWT_SECRET="replace-with-a-long-random-secret"
+JWT_EXPIRES_IN=1d
+BCRYPT_ROUNDS=12
 ```
 
 ### 3. Run Database Migration & Seed
@@ -75,6 +78,8 @@ DATABASE_URL="postgresql://user:password@host:5432/dbname?sslmode=require"
 cd backend
 npx prisma migrate deploy
 npx prisma db seed
+# Safely sync the expanded catalog without deleting users, carts, or orders
+npm run db:seed:catalog
 ```
 
 ### 4. Start Development
@@ -149,6 +154,16 @@ All product list endpoints return:
 | `PATCH`  | `/api/categories/:id`  | Update category          |
 | `DELETE` | `/api/categories/:id`  | Delete category          |
 
+### Authentication
+
+| Method | Endpoint | Description |
+| ------ | -------- | ----------- |
+| `POST` | `/api/auth/register` | Create an account and optionally migrate the `x-cart-id` guest cart |
+| `POST` | `/api/auth/login` | Log in and optionally merge the `x-cart-id` guest cart |
+| `GET` | `/api/auth/me` | Return the current user (`Authorization: Bearer <token>`) |
+
+Authenticated Cart and Checkout requests resolve ownership from the JWT user identity. The client cannot select another user's `cartId` or `userId`. Guest Cart and Guest Checkout remain supported through `x-cart-id`.
+
 ### Error Response Format
 
 All errors return a consistent format:
@@ -163,7 +178,9 @@ All errors return a consistent format:
 
 ## Current Phase
 
-**Phase 7 — Orders & Checkout** ✅ Complete
+**Phase 8 — Authentication & Authorization** ✅ Complete
+
+The catalog currently contains 20 products with local SVG artwork under `public/products`, so the storefront does not depend on FakeStore image URLs.
 
 See [ROADMAP.md](ROADMAP.md) for the full development plan.
 

@@ -11,6 +11,7 @@ const formatProduct = (p) => ({
   image: p.image,
   category: p.category ? p.category.name : '',
   categoryId: p.categoryId,
+  stock: p.stock,
   rating: { rate: 4.5, count: 120 }, // Placeholder until ratings model is added
   createdAt: p.createdAt,
   updatedAt: p.updatedAt,

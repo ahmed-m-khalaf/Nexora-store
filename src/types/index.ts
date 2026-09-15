@@ -43,7 +43,7 @@ export type ProductsResponse = {
     pagination: Pagination
 }
 
-export type CartProduct = Pick<Product, 'id' | 'title' | 'price' | 'image' | 'category'>
+export type CartProduct = Pick<Product, 'id' | 'title' | 'price' | 'image' | 'category' | 'stock'>
 
 export type CartItem = {
     id: number
@@ -69,6 +69,28 @@ export type CheckoutCustomer = {
     customerEmail: string
     customerPhone: string
     shippingAddress: string
+}
+
+export type User = {
+    id: number
+    email: string
+    name: string
+    role: 'CUSTOMER' | 'ADMIN'
+    cartId: string | null
+}
+
+export type AuthCredentials = {
+    email: string
+    password: string
+}
+
+export type RegisterInput = AuthCredentials & {
+    name: string
+}
+
+export type AuthResponse = {
+    token: string
+    user: User
 }
 
 export type OrderItem = {
@@ -127,4 +149,7 @@ export type ApiClient = {
     removeCartItem: (cartId: string, productId: number) => Promise<CartData>
     clearCart: (cartId: string) => Promise<CartData>
     checkout: (cartId: string, customer: CheckoutCustomer) => Promise<Order>
+    register: (input: RegisterInput, guestCartId?: string) => Promise<AuthResponse>
+    login: (input: AuthCredentials, guestCartId?: string) => Promise<AuthResponse>
+    getCurrentUser: () => Promise<{ user: User }>
 }

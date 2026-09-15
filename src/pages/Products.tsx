@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { api } from '../services/api'
 import CategoryFilter from '../components/catalog/CategoryFilter'
-import ProductCard from '../components/catalog/ProductCard'
+import ProductGrid from '../components/catalog/ProductGrid'
 import SearchBar from '../components/catalog/SearchBar'
 import FadeIn from '../components/common/FadeIn'
 import Loader from '../components/common/Loader'
@@ -195,11 +195,7 @@ function Products() {
                             </div>
                         ) : (
                             <>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {products.map(product => (
-                                        <ProductCard key={product.id} product={product} />
-                                    ))}
-                                </div>
+                                <ProductGrid products={products} />
 
                                 {/* Pagination Controls */}
                                 {pagination.totalPages > 1 && (
