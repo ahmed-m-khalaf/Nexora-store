@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '../features/auth/AuthContext'
 import { CartProvider } from '../features/cart/CartContext'
+import { ToastProvider } from '../features/toast/ToastContext'
 import ProtectedRoute from '../components/common/ProtectedRoute'
+import ToastContainer from '../components/common/ToastContainer'
+import ScrollToTop from '../components/common/ScrollToTop'
 import Footer from '../components/layout/Footer'
 import Navbar from '../components/layout/Navbar'
 import Account from '../pages/Account'
@@ -18,11 +21,13 @@ import '../styles/app.css'
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <CartProvider>
-          <div className="flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-1">
+      <ScrollToTop />
+      <ToastProvider>
+        <AuthProvider>
+          <CartProvider>
+            <div className="flex flex-col min-h-screen">
+              <Navbar />
+              <main className="flex-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/products" element={<Products />} />
@@ -38,9 +43,11 @@ export default function App() {
               </Routes>
             </main>
             <Footer />
+            <ToastContainer />
           </div>
         </CartProvider>
       </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

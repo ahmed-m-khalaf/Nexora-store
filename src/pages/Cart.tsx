@@ -126,6 +126,21 @@ function Cart() {
                     <div className="bg-gray-50 p-6 rounded-xl h-fit border border-gray-200 shadow-sm">
                         <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
 
+                        {/* Free Shipping Progress Bar */}
+                        <div className="mb-6 rounded-lg bg-white p-4 border border-blue-100 shadow-sm">
+                            <p className="text-sm font-medium text-gray-700 mb-2">
+                                {cartData.subtotal >= 100 
+                                    ? <span className="text-green-600 font-semibold flex items-center gap-1">🎉 You've unlocked free shipping!</span> 
+                                    : <>You're <span className="font-bold text-primary-600">${(100 - cartData.subtotal).toFixed(2)}</span> away from free shipping</>}
+                            </p>
+                            <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                                <div 
+                                    className={`h-full rounded-full transition-all duration-500 ease-out ${cartData.subtotal >= 100 ? 'bg-green-500' : 'bg-primary-500'}`}
+                                    style={{ width: `${Math.min(100, (cartData.subtotal / 100) * 100)}%` }}
+                                />
+                            </div>
+                        </div>
+
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>

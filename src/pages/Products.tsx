@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../services/api'
 import CategoryFilter from '../components/catalog/CategoryFilter'
 import ProductGrid from '../components/catalog/ProductGrid'
 import SearchBar from '../components/catalog/SearchBar'
 import FadeIn from '../components/common/FadeIn'
-import Loader from '../components/common/Loader'
 import type { Pagination, Product, ProductSortField, SortOrder } from '../types'
 import { getErrorMessage } from '../utils/errors'
 
@@ -20,6 +20,8 @@ const SORT_OPTIONS = [
 const ITEMS_PER_PAGE = 12
 
 function Products() {
+    const [searchParams, setSearchParams] = useSearchParams()
+
     // Data state
     const [products, setProducts] = useState<Product[]>([])
     const [categories, setCategories] = useState<string[]>([])
@@ -29,27 +31,26 @@ function Products() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
-    // Filter/search/sort state
-    const [searchTerm, setSearchTerm] = useState('')
-    const [selectedCategory, setSelectedCategory] = useState('all')
-    const [sortValue, setSortValue] = useState('id-asc')
-    const [currentPage, setCurrentPage] = useState(1)
+    // Filter/search/sort state from URL
+    const urlSearch = searchParams.get('search') || ''
+    const urlCategory = searchParams.get('category') || 'all'
+    const urlSort = searchParams.get('sort') || 'id-asc'
+    const urlPage = parseInt(searchParams.get('page') || '1', 10) || 1
 
-    // Debounce search
-    const [debouncedSearch, setDebouncedSearch] = useState('')
+    const [searchTerm, setSearchTerm] = useState(urlSearch)
 
+    // Debounce search update to URL
     useEffect(() => {
         const timer = setTimeout(() => {
-            setDebouncedSearch(searchTerm)
-            setCurrentPage(1) // Reset to page 1 on new search
+            setSearchParams(prev => {
+                if (searchTerm) prev.set('search', searchTerm)
+                else prev.delete('search')
+                if (urlSearch !== searchTerm) prev.set('page', '1') // Reset page only if search changed
+                return prev
+            }, { replace: true })
         }, 400)
         return () => clearTimeout(timer)
-    }, [searchTerm])
-
-    // Reset page when category or sort changes
-    useEffect(() => {
-        setCurrentPage(1)
-    }, [selectedCategory, sortValue])
+    }, [searchTerm, setSearchParams, urlSearch])
 
     // Fetch categories once
     useEffect(() => {
@@ -64,18 +65,18 @@ function Products() {
         fetchCategories()
     }, [])
 
-    // Fetch products (server-side search, filter, sort, pagination)
+    // Fetch products
     const fetchProducts = useCallback(async () => {
         try {
             setLoading(true)
             setError(null)
 
-            const [sortBy, order] = sortValue.split('-') as [ProductSortField, SortOrder]
+            const [sortBy, order] = urlSort.split('-') as [ProductSortField, SortOrder]
 
             const result = await api.getProducts({
-                search: debouncedSearch,
-                category: selectedCategory,
-                page: currentPage,
+                search: urlSearch,
+                category: urlCategory,
+                page: urlPage,
                 limit: ITEMS_PER_PAGE,
                 sortBy,
                 order,
@@ -89,16 +90,36 @@ function Products() {
         } finally {
             setLoading(false)
         }
-    }, [debouncedSearch, selectedCategory, sortValue, currentPage])
+    }, [urlSearch, urlCategory, urlSort, urlPage])
 
     useEffect(() => {
         fetchProducts()
     }, [fetchProducts])
 
+    // URL Handlers
+    const setCategory = (cat: string) => {
+        setSearchParams(prev => {
+            prev.set('category', cat)
+            prev.set('page', '1')
+            return prev
+        })
+    }
+
+    const setSortValue = (sort: string) => {
+        setSearchParams(prev => {
+            prev.set('sort', sort)
+            prev.set('page', '1')
+            return prev
+        })
+    }
+
     // Pagination handlers
     const goToPage = (page: number) => {
         if (page >= 1 && page <= pagination.totalPages) {
-            setCurrentPage(page)
+            setSearchParams(prev => {
+                prev.set('page', page.toString())
+                return prev
+            })
             window.scrollTo({ top: 0, behavior: 'smooth' })
         }
     }
@@ -108,7 +129,7 @@ function Products() {
         const { totalPages } = pagination
         const pages = []
         const maxVisible = 5
-        let start = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+        let start = Math.max(1, urlPage - Math.floor(maxVisible / 2))
         const end = Math.min(totalPages, start + maxVisible - 1)
         if (end - start < maxVisible - 1) {
             start = Math.max(1, end - maxVisible + 1)
@@ -129,8 +150,8 @@ function Products() {
                     <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
                     <CategoryFilter
                         categories={categories}
-                        selectedCategory={selectedCategory}
-                        onSelectCategory={setSelectedCategory}
+                        selectedCategory={urlCategory}
+                        onSelectCategory={setCategory}
                     />
 
                     {/* Sort & Results Info Bar */}
@@ -150,7 +171,7 @@ function Products() {
                             <label htmlFor="sort-select" className="text-sm text-gray-500 whitespace-nowrap">Sort by:</label>
                             <select
                                 id="sort-select"
-                                value={sortValue}
+                                value={urlSort}
                                 onChange={(e) => setSortValue(e.target.value)}
                                 className="px-3 py-2 rounded-lg border border-gray-300 bg-white text-sm text-gray-700 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition cursor-pointer"
                             >
@@ -177,17 +198,14 @@ function Products() {
                     </div>
                 )}
 
-                {/* Loading State */}
-                {loading && !error && <Loader />}
-
-                {/* Products Grid */}
-                {!loading && !error && (
+                {/* Products Grid with Skeleton */}
+                {!error && (
                     <>
-                        {products.length === 0 ? (
+                        {products.length === 0 && !loading ? (
                             <div className="text-center py-12">
                                 <p className="text-xl text-gray-600">No products found matching your criteria.</p>
                                 <button
-                                    onClick={() => { setSearchTerm(''); setSelectedCategory('all'); setSortValue('id-asc'); }}
+                                    onClick={() => { setSearchTerm(''); setCategory('all'); setSortValue('id-asc'); }}
                                     className="mt-4 text-primary-600 hover:text-primary-700 font-medium"
                                 >
                                     Clear Filters
@@ -195,14 +213,14 @@ function Products() {
                             </div>
                         ) : (
                             <>
-                                <ProductGrid products={products} />
+                                <ProductGrid products={products} loading={loading} skeletonCount={12} />
 
                                 {/* Pagination Controls */}
                                 {pagination.totalPages > 1 && (
                                     <div className="flex items-center justify-center gap-2 mt-12">
                                         <button
-                                            onClick={() => goToPage(currentPage - 1)}
-                                            disabled={currentPage === 1}
+                                            onClick={() => goToPage(urlPage - 1)}
+                                            disabled={urlPage === 1}
                                             className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
                                         >
                                             ← Previous
@@ -227,7 +245,7 @@ function Products() {
                                                 key={page}
                                                 onClick={() => goToPage(page)}
                                                 className={`w-10 h-10 rounded-lg text-sm font-medium transition ${
-                                                    page === currentPage
+                                                    page === urlPage
                                                         ? 'bg-primary-600 text-white shadow-md'
                                                         : 'border border-gray-300 text-gray-600 hover:bg-gray-100'
                                                 }`}
@@ -251,8 +269,8 @@ function Products() {
                                         )}
 
                                         <button
-                                            onClick={() => goToPage(currentPage + 1)}
-                                            disabled={currentPage === pagination.totalPages}
+                                            onClick={() => goToPage(urlPage + 1)}
+                                            disabled={urlPage === pagination.totalPages}
                                             className="px-4 py-2 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition disabled:opacity-40 disabled:cursor-not-allowed text-sm font-medium"
                                         >
                                             Next →

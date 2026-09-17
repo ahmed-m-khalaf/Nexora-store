@@ -2,15 +2,20 @@ import { useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import type { Product } from '../../types'
 import ProductCard from './ProductCard'
+import ProductCardSkeleton from './ProductCardSkeleton'
 
-type ProductGridProps = { products: Product[] }
+type ProductGridProps = { 
+    products: Product[] 
+    loading?: boolean
+    skeletonCount?: number
+}
 
-export default function ProductGrid({ products }: ProductGridProps) {
+export default function ProductGrid({ products, loading = false, skeletonCount = 8 }: ProductGridProps) {
     const ref = useRef<HTMLDivElement>(null)
 
     useLayoutEffect(() => {
         const element = ref.current
-        if (!element) return
+        if (!element || loading) return
 
         const cards = element.querySelectorAll<HTMLElement>('[data-product-card]')
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -27,11 +32,13 @@ export default function ProductGrid({ products }: ProductGridProps) {
         }, ref)
 
         return () => context.revert()
-    }, [products])
+    }, [products, loading])
 
     return (
         <div ref={ref} className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {products.map((product) => <ProductCard key={product.id} product={product} />)}
+            {loading 
+                ? Array.from({ length: skeletonCount }).map((_, i) => <ProductCardSkeleton key={`skel-${i}`} />)
+                : products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
     )
 }

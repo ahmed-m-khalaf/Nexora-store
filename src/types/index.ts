@@ -71,6 +71,13 @@ export type CheckoutCustomer = {
     shippingAddress: string
 }
 
+export type CheckoutFormErrors = {
+    customerName?: string
+    customerEmail?: string
+    customerPhone?: string
+    shippingAddress?: string
+}
+
 export type User = {
     id: number
     email: string
@@ -152,4 +159,26 @@ export type ApiClient = {
     register: (input: RegisterInput, guestCartId?: string) => Promise<AuthResponse>
     login: (input: AuthCredentials, guestCartId?: string) => Promise<AuthResponse>
     getCurrentUser: () => Promise<{ user: User }>
+}
+
+export type ToastType = 'success' | 'error' | 'info' | 'warning'
+
+export type Toast = {
+    id: string
+    type: ToastType
+    message: string
+    action?: {
+        label: string
+        onClick: () => void
+    }
+}
+
+export type ToastContextValue = {
+    toasts: Toast[]
+    addToast: (toast: Omit<Toast, 'id'>) => void
+    removeToast: (id: string) => void
+    success: (message: string, action?: Toast['action']) => void
+    error: (message: string, action?: Toast['action']) => void
+    info: (message: string, action?: Toast['action']) => void
+    warning: (message: string, action?: Toast['action']) => void
 }

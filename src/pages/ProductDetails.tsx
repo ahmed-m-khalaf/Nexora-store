@@ -1,10 +1,10 @@
-import { useState, useEffect, type MouseEvent } from 'react'
+import { useState, useEffect, useRef, type MouseEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { FiArrowLeft, FiCheck, FiChevronRight, FiMinus, FiPlus, FiShield, FiShoppingBag, FiStar, FiTruck } from 'react-icons/fi'
 import { api } from '../services/api'
 import { useCart } from '../features/cart/useCart'
 import FadeIn from '../components/common/FadeIn'
-import Loader from '../components/common/Loader'
+import ProductDetailsSkeleton from '../components/catalog/ProductDetailsSkeleton'
 import type { Product } from '../types'
 
 function ProductDetails() {
@@ -16,6 +16,9 @@ function ProductDetails() {
   const [quantity, setQuantity] = useState(1)
   const [addStatus, setAddStatus] = useState<'idle' | 'added' | 'error'>('idle')
   const [addError, setAddError] = useState('')
+
+  const [showSticky, setShowSticky] = useState(false)
+  const ctaRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -37,6 +40,22 @@ function ProductDetails() {
     void fetchProduct()
   }, [id])
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+        ([entry]) => {
+            // Show sticky bar when main CTA is out of view (above the viewport)
+            setShowSticky(entry.boundingClientRect.y < 0 && !entry.isIntersecting)
+        },
+        { threshold: 0 }
+    )
+
+    if (ctaRef.current) {
+        observer.observe(ctaRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [product, loading])
+
   const handleAddToCart = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
     if (!product) return
@@ -52,7 +71,7 @@ function ProductDetails() {
     }
   }
 
-  if (loading) return <Loader />
+  if (loading) return <ProductDetailsSkeleton />
   if (error) return <div className="text-center text-red-500 py-12">{error}</div>
   if (!product) return <div className="text-center py-12">Product not found</div>
 
@@ -62,7 +81,7 @@ function ProductDetails() {
 
   return (
     <FadeIn>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative">
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-2 text-sm text-slate-500">
           <Link to="/" className="hover:text-primary-600 transition">Home</Link>
@@ -74,7 +93,7 @@ function ProductDetails() {
           <span className="truncate max-w-[200px] text-slate-400 hidden sm:inline">{product.title}</span>
         </nav>
 
-        <div className="grid grid-cols-1 gap-10 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:p-8 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-10 rounded-lg border border-slate-200 bg-white p-5 shadow-sm md:p-8 lg:grid-cols-2 pb-24 md:pb-8">
           <div className="flex min-h-[420px] items-center justify-center rounded-lg bg-slate-50 p-6">
             <img
               src={product.image}
@@ -151,6 +170,7 @@ function ProductDetails() {
               {addStatus === 'error' && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{addError}</p>}
 
               <button
+                ref={ctaRef}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock || addStatus === 'added'}
                 className={`flex w-full items-center justify-center gap-2 rounded-lg py-4 font-bold text-white shadow-md transition active:scale-[0.99] disabled:cursor-not-allowed ${
@@ -166,6 +186,27 @@ function ProductDetails() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Sticky Mobile Add-to-Cart */}
+      <div className={`fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-slate-200 bg-white/90 p-4 backdrop-blur-lg transition-transform duration-300 md:hidden ${showSticky ? 'translate-y-0' : 'translate-y-full'}`}>
+          <div className="flex flex-col">
+              <span className="text-sm font-medium text-slate-500 line-clamp-1">{product.title}</span>
+              <span className="font-bold text-slate-900">${product.price.toFixed(2)}</span>
+          </div>
+          <button
+              onClick={handleAddToCart}
+              disabled={isOutOfStock || addStatus === 'added'}
+              className={`flex h-11 min-w-[140px] flex-1 items-center justify-center gap-2 rounded-lg px-4 font-bold text-white shadow-sm transition active:scale-95 disabled:cursor-not-allowed ${
+                  addStatus === 'added'
+                      ? 'bg-emerald-600'
+                      : isOutOfStock
+                          ? 'bg-slate-300'
+                          : 'bg-primary-600 hover:bg-primary-700'
+              }`}
+          >
+              {addStatus === 'added' ? 'Added' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+          </button>
       </div>
     </FadeIn>
   )

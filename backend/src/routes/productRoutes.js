@@ -8,24 +8,32 @@ import {
   deleteProduct
 } from '../controllers/productController.js';
 
+import {
+  validateGetProducts,
+  validateProductId,
+  validateCreateProduct,
+  validateUpdateProduct
+} from '../middleware/validators/product.js';
+import { handleValidationErrors } from '../middleware/validators/index.js';
+
 const router = express.Router();
 
 // GET /api/products (supports ?search, ?category, ?sortBy, ?order, ?page, ?limit)
-router.get('/', getAllProducts);
+router.get('/', validateGetProducts, handleValidationErrors, getAllProducts);
 
 // GET /api/products/category/:category
 router.get('/category/:category', getProductsByCategory);
 
 // GET /api/products/:id
-router.get('/:id', getProductById);
+router.get('/:id', validateProductId, handleValidationErrors, getProductById);
 
 // POST /api/products
-router.post('/', createProduct);
+router.post('/', validateCreateProduct, handleValidationErrors, createProduct);
 
 // PATCH /api/products/:id
-router.patch('/:id', updateProduct);
+router.patch('/:id', validateProductId, validateUpdateProduct, handleValidationErrors, updateProduct);
 
 // DELETE /api/products/:id
-router.delete('/:id', deleteProduct);
+router.delete('/:id', validateProductId, handleValidationErrors, deleteProduct);
 
 export default router;

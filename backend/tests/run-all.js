@@ -3,7 +3,7 @@ import { spawn } from 'node:child_process';
 const TEST_PORT = process.env.TEST_PORT || '5050';
 const ROOT_URL = process.env.TEST_ROOT_URL || `http://localhost:${TEST_PORT}`;
 const API_BASE_URL = process.env.API_BASE_URL || `${ROOT_URL}/api`;
-const TEST_FILES = ['tests/api.test.js', 'tests/cart.test.js', 'tests/auth.test.js', 'tests/order.test.js'];
+const TEST_FILES = ['tests/api.test.js', 'tests/cart.test.js', 'tests/auth.test.js', 'tests/order.test.js', 'tests/security.test.js'];
 
 let serverProcess = null;
 let serverLogs = '';

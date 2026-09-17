@@ -176,11 +176,34 @@ All errors return a consistent format:
 }
 ```
 
+### Security & Middleware (Phase 9)
+
+- **Helmet**: Secures HTTP response headers (`X-Content-Type-Options`, `X-Frame-Options`, etc.).
+- **Rate Limiting (`express-rate-limit`)**:
+  - Global `/api`: 100 requests / 15 mins.
+  - `/api/auth`: 5 requests / 15 mins (skips successful attempts).
+  - `/api/orders`: 10 requests / 15 mins.
+  - Automatically disabled in `test` environment (`NODE_ENV=test`).
+- **Input Validation & Sanitization (`express-validator`)**: Strict whitelist and boundaries for pagination (`page >= 1`, `limit 1-100`), queries, IDs, and checkout fields with sanitizers (`.trim()`, `.escape()`, `.normalizeEmail()`).
+- **CORS Hardening**: Origin configured via `CORS_ORIGIN` env variable with credential support.
+- **Payload Limits**: JSON body parser strictly capped at `16kb`.
+- **Centralized Error Mapping**: Automatic mapping of Prisma codes (`P2002` -> 409, `P2003` -> 400, `P2025` -> 404) and JWT exceptions.
+- **Process Handlers**: Graceful exit on `unhandledRejection` and `uncaughtException`.
+
+### Authorization Audit Notice
+- Product mutation endpoints (`POST /api/products`, `PATCH /api/products/:id`, `DELETE /api/products/:id`) currently operate with request validation only and without admin access guards. RBAC enforcement is reserved for subsequent phases.
+
 ## Current Phase
 
-**Phase 8 — Authentication & Authorization** ✅ Complete
+**Phase 9 — Validation, Security & Centralized Error Handling** ✅ Complete
+**UI/UX Professional Upgrade** ✅ Complete
 
-The catalog currently contains 20 products with local SVG artwork under `public/products`, so the storefront does not depend on FakeStore image URLs.
+- Zero-dependency custom Toast notifications.
+- Fluid Skeleton loaders replacing spinners.
+- Multi-step Checkout flow (Contact -> Review -> Confirm).
+- URL-driven catalog search & filter persistence.
+- Interactive Quick View modal.
+- Sticky mobile CTA & dynamic Free Shipping progress bar.
 
 See [ROADMAP.md](ROADMAP.md) for the full development plan.
 

@@ -1,9 +1,17 @@
-import { useLayoutEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
+import { FiSearch } from 'react-icons/fi'
+import type { Product } from '../../types'
 
-function Hero() {
+type HeroProps = {
+    featuredProduct?: Product
+}
+
+function Hero({ featuredProduct }: HeroProps) {
     const ref = useRef<HTMLElement>(null)
+    const navigate = useNavigate()
+    const [searchQuery, setSearchQuery] = useState('')
 
     useLayoutEffect(() => {
         const element = ref.current
@@ -32,6 +40,13 @@ function Hero() {
         return () => context.revert()
     }, [])
 
+    const handleSearch = (e: FormEvent) => {
+        e.preventDefault()
+        if (searchQuery.trim()) {
+            navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+        }
+    }
+
     return (
         <section ref={ref} className="relative isolate overflow-hidden bg-slate-950 text-white">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.3),_transparent_40%),radial-gradient(circle_at_bottom_left,_rgba(20,184,166,0.18),_transparent_40%)]" />
@@ -47,7 +62,7 @@ function Hero() {
                     <p className="hero-piece mt-6 max-w-xl text-lg leading-8 text-slate-300">
                         Discover a focused collection of useful, beautiful pieces — selected to make work, travel, and life feel lighter.
                     </p>
-                    <div className="hero-piece mt-8 flex flex-wrap gap-4">
+                    <div className="hero-piece mt-8 flex flex-wrap gap-4 mb-8">
                         <Link to="/products" className="rounded-xl bg-cyan-400 px-6 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300">
                             Explore collection <span aria-hidden="true">→</span>
                         </Link>
@@ -55,16 +70,47 @@ function Hero() {
                             Shop tech
                         </Link>
                     </div>
+
+                    <form onSubmit={handleSearch} className="hero-piece relative max-w-md">
+                        <div className="relative">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+                                <FiSearch className="h-5 w-5 text-gray-400" />
+                            </div>
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search products..."
+                                className="block w-full rounded-xl border border-white/20 bg-white/10 py-3.5 pl-11 pr-4 text-white placeholder:text-gray-400 focus:border-cyan-400 focus:bg-white/20 focus:outline-none focus:ring-1 focus:ring-cyan-400 backdrop-blur sm:text-sm"
+                            />
+                            <button type="submit" className="absolute inset-y-1.5 right-1.5 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300 transition">
+                                Search
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 <div className="hero-piece relative mx-auto w-full max-w-md">
                     <div className="absolute -inset-6 rounded-[2rem] bg-cyan-400/20 blur-2xl" />
-                    <div className="relative rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl">
-                        <img src="/products/headphones.svg" alt="Featured wireless headphones" className="w-full rounded-2xl" />
+                    <Link to={featuredProduct ? `/product/${featuredProduct.id}` : '#'} className="relative block rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl group hover:border-white/30 transition">
+                        <img 
+                            src={featuredProduct?.image || "/products/headphones.svg"} 
+                            alt={featuredProduct?.title || "Featured wireless headphones"} 
+                            className="w-full h-72 object-contain bg-white rounded-2xl p-4 transition-transform group-hover:scale-105" 
+                            onError={(e) => {
+                                e.currentTarget.onerror = null
+                                e.currentTarget.src = '/products/placeholder.svg'
+                            }}
+                        />
                         <div className="mt-4 flex items-center justify-between">
-                            <div><p className="text-sm text-slate-300">Featured pick</p><p className="font-bold">Pulse Wireless Headphones</p></div>
-                            <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-sm font-bold text-emerald-200">$89</span>
+                            <div className="flex-1 mr-4">
+                                <p className="text-sm text-slate-300">Featured pick</p>
+                                <p className="font-bold line-clamp-1">{featuredProduct?.title || "Pulse Wireless Headphones"}</p>
+                            </div>
+                            <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-sm font-bold text-emerald-200 shrink-0">
+                                ${featuredProduct?.price.toFixed(2) || "89.00"}
+                            </span>
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </section>

@@ -4,6 +4,7 @@ import type { CartContextValue, CartData, CartProductInput, CheckoutCustomer } f
 import { getErrorMessage } from '../../utils/errors'
 import { CartContext } from './cartContextValue'
 import { useAuth } from '../auth/useAuth'
+import { useToast } from '../toast/useToast'
 
 const EMPTY_CART: CartData = {
     id: '', items: [], itemCount: 0, subtotal: 0, tax: 0, shipping: 0, total: 0,
@@ -22,6 +23,7 @@ function getOrCreateGuestCartId(): string {
 
 export function CartProvider({ children }: PropsWithChildren) {
     const { user } = useAuth()
+    const { success, error: toastError, info } = useToast()
     const [cartData, setCartData] = useState<CartData>(EMPTY_CART)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -46,13 +48,17 @@ export function CartProvider({ children }: PropsWithChildren) {
 
     const addToCart = async (productOrId: CartProductInput, quantity = 1): Promise<CartData> => {
         const productId = typeof productOrId === 'object' ? productOrId.id : productOrId
+        const productName = typeof productOrId === 'object' ? productOrId.title : 'Item'
         try {
             setError(null)
             const updatedCart = await api.addToCart(cartId, productId, quantity)
             setCartData(updatedCart)
+            success(`${quantity} x ${productName} added to cart`)
             return updatedCart
         } catch (addError) {
-            setError(getErrorMessage(addError, 'Failed to add item to cart'))
+            const msg = getErrorMessage(addError, 'Failed to add item to cart')
+            setError(msg)
+            toastError(msg)
             throw addError
         }
     }
@@ -62,9 +68,12 @@ export function CartProvider({ children }: PropsWithChildren) {
             setError(null)
             const updatedCart = await api.updateCartItem(cartId, productId, quantity)
             setCartData(updatedCart)
+            info('Cart updated')
             return updatedCart
         } catch (updateError) {
-            setError(getErrorMessage(updateError, 'Failed to update item quantity'))
+            const msg = getErrorMessage(updateError, 'Failed to update item quantity')
+            setError(msg)
+            toastError(msg)
             throw updateError
         }
     }
@@ -74,9 +83,12 @@ export function CartProvider({ children }: PropsWithChildren) {
             setError(null)
             const updatedCart = await api.removeCartItem(cartId, productId)
             setCartData(updatedCart)
+            info('Item removed from cart')
             return updatedCart
         } catch (removeError) {
-            setError(getErrorMessage(removeError, 'Failed to remove item'))
+            const msg = getErrorMessage(removeError, 'Failed to remove item')
+            setError(msg)
+            toastError(msg)
             throw removeError
         }
     }
@@ -86,9 +98,12 @@ export function CartProvider({ children }: PropsWithChildren) {
             setError(null)
             const updatedCart = await api.clearCart(cartId)
             setCartData(updatedCart)
+            info('Cart cleared')
             return updatedCart
         } catch (clearError) {
-            setError(getErrorMessage(clearError, 'Failed to clear cart'))
+            const msg = getErrorMessage(clearError, 'Failed to clear cart')
+            setError(msg)
+            toastError(msg)
             throw clearError
         }
     }
@@ -98,9 +113,12 @@ export function CartProvider({ children }: PropsWithChildren) {
             setError(null)
             const order = await api.checkout(cartId, customer)
             setCartData({ ...EMPTY_CART, id: cartId })
+            success('Order placed successfully!')
             return order
         } catch (checkoutError) {
-            setError(getErrorMessage(checkoutError, 'Failed to place order'))
+            const msg = getErrorMessage(checkoutError, 'Failed to place order')
+            setError(msg)
+            toastError(msg)
             throw checkoutError
         }
     }

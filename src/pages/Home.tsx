@@ -38,7 +38,7 @@ function Home() {
     return (
         <FadeIn>
             <div>
-                <Hero />
+                <Hero featuredProduct={products[0]} />
 
                 {/* Featured Products Section */}
                 <ScrollReveal>
@@ -51,16 +51,14 @@ function Home() {
                             </div>
                         </div>
 
-                        {loading ? (
-                            <Loader />
-                        ) : error ? (
+                        {error ? (
                             <div className="py-8 text-center">
                                 <p className="mb-4 text-red-500">{error}</p>
                                 <button onClick={fetchFeaturedProducts} className="rounded-xl bg-primary-600 px-6 py-3 font-semibold text-white transition hover:bg-primary-700">
                                     Try again
                                 </button>
                             </div>
-                        ) : <ProductGrid products={products} />}
+                        ) : <ProductGrid products={products} loading={loading} skeletonCount={4} />}
                     </div>
                 </ScrollReveal>
             </div>
