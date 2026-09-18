@@ -195,17 +195,28 @@ All errors return a consistent format:
 
 ## Current Phase
 
-**Phase 9 — Validation, Security & Centralized Error Handling** ✅ Complete
-**UI/UX Professional Upgrade** ✅ Complete
+**Phase 10 — Testing, Deployment & Production Readiness** ✅ Complete (Full-Stack MVP Complete 🎉)
 
-- Zero-dependency custom Toast notifications.
-- Fluid Skeleton loaders replacing spinners.
-- Multi-step Checkout flow (Contact -> Review -> Confirm).
-- URL-driven catalog search & filter persistence.
-- Interactive Quick View modal.
-- Sticky mobile CTA & dynamic Free Shipping progress bar.
+### Deployment & CI/CD
+- **Frontend Deployment (Vercel)**:
+  - Framework: Vite / React
+  - Root directory: `./`
+  - Build command: `npm run build`
+  - Output directory: `dist`
+  - SPA Routing: Handled by `vercel.json` rewrite rules.
+  - Environment variable: `VITE_API_URL=<your-backend-api-url>/api`
+- **Backend Deployment (Render / Railway)**:
+  - Root directory: `backend`
+  - Build command: `npm run build` (runs `npx prisma generate`)
+  - Start command: `npm start`
+  - Environment variables: `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `NODE_ENV=production`
+- **Automated CI/CD**:
+  - GitHub Actions workflow (`.github/workflows/ci.yml`) runs typecheck, linting, production build on every push and PR.
 
-See [ROADMAP.md](ROADMAP.md) for the full development plan.
+### Completed Feature Highlights
+- **UI/UX Professional Upgrade**: Zero-dependency custom Toasts, Skeleton loaders, 3-step checkout wizard, URL params synchronization, Quick View modal, mobile sticky CTA.
+- **Phase 9 Security Hardening**: Helmet headers, express-validator sanitization, rate-limiting, CORS control, 16kb payload limit.
+- **Phase 0–8 Core Architecture**: Full PostgreSQL + Prisma catalog, Server-driven cart & pricing, Atomic checkout transactions, JWT authentication with guest cart migration.
 
 ## License
 

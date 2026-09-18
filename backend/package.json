@@ -5,6 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "node --watch src/server.js",
+    "build": "npx prisma generate",
     "start": "node src/server.js",
     "test": "node tests/api.test.js",
     "test:cart": "node tests/cart.test.js",

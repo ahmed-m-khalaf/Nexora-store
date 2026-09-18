@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type MouseEvent } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { FiArrowLeft, FiCheck, FiChevronRight, FiMinus, FiPlus, FiShield, FiShoppingBag, FiStar, FiTruck } from 'react-icons/fi'
+import { FiCheck, FiChevronRight, FiMinus, FiPlus, FiShield, FiShoppingBag, FiStar, FiTruck } from 'react-icons/fi'
 import { api } from '../services/api'
 import { useCart } from '../features/cart/useCart'
 import FadeIn from '../components/common/FadeIn'
