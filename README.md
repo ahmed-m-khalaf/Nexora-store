@@ -217,6 +217,12 @@ All errors return a consistent format:
 - **UI/UX Professional Upgrade**: Zero-dependency custom Toasts, Skeleton loaders, 3-step checkout wizard, URL params synchronization, Quick View modal, mobile sticky CTA.
 - **Phase 9 Security Hardening**: Helmet headers, express-validator sanitization, rate-limiting, CORS control, 16kb payload limit.
 - **Phase 0–8 Core Architecture**: Full PostgreSQL + Prisma catalog, Server-driven cart & pricing, Atomic checkout transactions, JWT authentication with guest cart migration.
+- **Phase 14 Email Notifications**: Automated asynchronous email confirmations using `nodemailer` (Welcome email on registration, order receipt on checkout) with graceful development fallback.
+
+### Future Extensions (Optional)
+- **Phase 11**: Admin Dashboard (Product & Order management)
+- **Phase 12**: Payments Integration (Stripe / PayPal)
+- **Phase 13**: Caching & Performance (Redis)
 
 ## License
 

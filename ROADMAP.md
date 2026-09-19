@@ -31,6 +31,14 @@ UI/UX Professional Upgrade (Design System & Shopping Experience) ✅
 PHASE 9: Validation, Security & Centralized Error Handling ✅
    ↓
 PHASE 10: Testing, Deployment & Production Polish ✅ (Core MVP Complete 🎉)
+   ↓
+PHASE 11: Admin Dashboard (Future Extension)
+   ↓
+PHASE 12: Payments Integration (Stripe / PayPal) (Future Extension)
+   ↓
+PHASE 13: Caching & Performance (Redis) (Future Extension)
+   ↓
+PHASE 14: Email Notifications (Nodemailer & SMTP) ✅
 ```
 
 ---
@@ -1162,30 +1170,29 @@ app.use(compression());
 
 ---
 
-## 🎉 المراحل المستقبلية (Optional)
+## 🎉 المراحل المستقبلية (Optional Extensions)
 
-### Phase 11 — Admin Dashboard
-- Admin panel لإدارة المنتجات والطلبات
-- Order management
-- User management
-- Analytics
+### Phase 11 — Admin Dashboard (لوحة تحكم الإدارة)
+- [ ] لوحة تحكم محمية للمديرين فقط (`UserRole.ADMIN`)
+- [ ] إضافة، تعديل، وحذف المنتجات ورفع الصور
+- [ ] عرض جميع الطلبات وتحديث حالتها (`PENDING` -> `SHIPPED` -> `DELIVERED`)
+- [ ] إحصائيات المبيعات والأرباح اليومية والشهرية
 
-### Phase 12 — Advanced Features
-- Product reviews (real)
-- Wishlist
-- Order tracking
-- Email notifications
-- Password reset
-- Image upload
+### Phase 12 — Payments Integration (بوابات الدفع الإلكتروني)
+- [ ] ربط بوابة دفع Stripe أو PayPal
+- [ ] إنشاء Payment Intents من الباك إند
+- [ ] التحقق من الدفع عبر Webhooks
+- [ ] دعم الفواتير وإرجاع المبالغ (Refunds)
 
-### Phase 13 — Payment Integration
-- Stripe/PayPal
-- Webhooks
-- Refunds
-- Invoices
+### Phase 13 — Caching & Performance (Redis)
+- [ ] إعداد خادم Redis (Upstash / Redis Cloud)
+- [ ] Cache لأكثر المنتجات طلباً وتصنيفات الـ Catalog
+- [ ] Cache Invalidation تلقائي عند تعديل أي منتج
+- [ ] تخفيف الضغط على قاعدة البيانات وتحسين وقت الاستجابة (Latency)
 
-### Phase 14 — Performance & Scale
-- Redis caching
-- Database replicas
-- CDN
-- Search optimization
+### Phase 14 — Email Notifications (إشعارات البريد الإلكتروني) ✅
+- [x] إعداد `nodemailer` مع دعم خوادم SMTP الحقيقية (Gmail, Resend, SendGrid)
+- [x] وضع المحاكاة (Mock/Console Logger) للبيئة المحلية لتفادي تعطل السيرفر
+- [x] إرسال إيميل ترحيبي بتصميم HTML عند تسجيل مستخدم جديد
+- [x] إرسال إيميل تأكيد طلب (Order Confirmation) مفصل بالأسعار والمنتجات فور إتمام الـ Checkout
+- [x] إرسال غير تزامني (Non-blocking) لضمان سرعة الاستجابة للمستخدم
