@@ -29,7 +29,7 @@ export default function MagneticButton({
   const textRef = useRef<HTMLSpanElement>(null)
 
   const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
-    if (disabled || !containerRef.current) return
+    if (disabled || !containerRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const { left, top, width, height } = containerRef.current.getBoundingClientRect()
     const centerX = left + width / 2
@@ -56,7 +56,7 @@ export default function MagneticButton({
   }
 
   const handleMouseLeave = () => {
-    if (disabled) return
+    if (disabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     // Return to original position with elastic bounce
     gsap.to([containerRef.current, textRef.current], {
@@ -67,20 +67,34 @@ export default function MagneticButton({
     })
   }
 
-  const props = {
-    ref: containerRef as any,
-    className: `relative inline-block ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${className}`,
-    onMouseMove: handleMouseMove,
-    onMouseLeave: handleMouseLeave,
-    onClick: disabled ? undefined : onClick,
-    disabled: Component === 'button' ? disabled : undefined,
+  if (Component === 'div') {
+    return (
+      <div
+        ref={containerRef as React.RefObject<HTMLDivElement | null>}
+        className={`relative inline-block ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${className}`}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        onClick={disabled ? undefined : onClick}
+      >
+        <span ref={textRef} className="inline-block">
+          {children}
+        </span>
+      </div>
+    )
   }
 
   return (
-    <Component {...props}>
+    <button
+      ref={containerRef as React.RefObject<HTMLButtonElement | null>}
+      className={`relative inline-block ${disabled ? 'cursor-not-allowed opacity-50' : ''} ${className}`}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+    >
       <span ref={textRef} className="inline-block">
         {children}
       </span>
-    </Component>
+    </button>
   )
 }

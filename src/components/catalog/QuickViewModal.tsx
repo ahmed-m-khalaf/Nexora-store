@@ -70,13 +70,14 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
             ref={dialogRef}
             onClose={handleClose}
             onClick={handleBackdropClick}
+            aria-labelledby="quick-view-title"
             className="backdrop:bg-black/50 backdrop:backdrop-blur-sm p-0 rounded-2xl shadow-2xl m-auto w-[90vw] max-w-4xl bg-white outline-none open:animate-in open:fade-in-0 open:zoom-in-95"
         >
             <div className="relative flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
                 <button
                     onClick={handleClose}
                     className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur rounded-full text-gray-500 hover:text-gray-900 transition shadow-sm"
-                    aria-label="Close"
+                    aria-label="Close dialog"
                 >
                     <FiX className="w-5 h-5" />
                 </button>
@@ -85,6 +86,8 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                     <img
                         src={product.image}
                         alt={product.title}
+                        loading="lazy"
+                        decoding="async"
                         className="max-h-[400px] w-full object-contain"
                     />
                 </div>
@@ -96,7 +99,7 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                         </span>
                     </div>
 
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{product.title}</h2>
+                    <h2 id="quick-view-title" className="text-2xl font-bold text-gray-900 mb-2">{product.title}</h2>
                     
                     <div className="flex items-center gap-2 mb-4">
                         <div className="flex text-amber-400">

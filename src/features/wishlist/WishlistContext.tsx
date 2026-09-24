@@ -1,13 +1,12 @@
-import { createContext, useCallback, useEffect, useState, type PropsWithChildren } from 'react'
+import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import type { Product, WishlistContextValue } from '../../types'
+import { WishlistContext } from './wishlistContextValue'
 import { useToast } from '../toast/useToast'
 import { useCart } from '../cart/useCart'
 import { openCartDrawer } from '../../hooks/useCartDrawer'
 import { celebrateAction } from '../../lib/confetti'
 
 const STORAGE_KEY = 'nexora_wishlist'
-
-export const WishlistContext = createContext<WishlistContextValue | null>(null)
 
 function loadInitialWishlist(): Product[] {
     try {

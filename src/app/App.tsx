@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '../features/auth/AuthContext'
 import { CartProvider } from '../features/cart/CartContext'
@@ -7,19 +8,25 @@ import { useSmoothScroll } from '../hooks/useSmoothScroll'
 import ProtectedRoute from '../components/common/ProtectedRoute'
 import ToastContainer from '../components/common/ToastContainer'
 import ScrollToTop from '../components/common/ScrollToTop'
+import PageFallback from '../components/common/PageFallback'
 import Footer from '../components/layout/Footer'
 import Navbar from '../components/layout/Navbar'
 import CartDrawer from '../components/layout/CartDrawer'
-import Account from '../pages/Account'
-import Cart from '../pages/Cart'
-import Checkout from '../pages/Checkout'
+
+// Eager load Home for instant First Contentful Paint
 import Home from '../pages/Home'
-import Login from '../pages/Login'
-import ProductDetails from '../pages/ProductDetails'
-import Products from '../pages/Products'
-import Register from '../pages/Register'
-import Wishlist from '../pages/Wishlist'
-import NotFound from '../pages/NotFound'
+
+// Code-split remaining routes for minimal initial bundle size
+const Products = lazy(() => import('../pages/Products'))
+const ProductDetails = lazy(() => import('../pages/ProductDetails'))
+const Cart = lazy(() => import('../pages/Cart'))
+const Wishlist = lazy(() => import('../pages/Wishlist'))
+const Checkout = lazy(() => import('../pages/Checkout'))
+const Login = lazy(() => import('../pages/Login'))
+const Register = lazy(() => import('../pages/Register'))
+const Account = lazy(() => import('../pages/Account'))
+const NotFound = lazy(() => import('../pages/NotFound'))
+
 import '../styles/app.css'
 
 function AppContent() {
@@ -36,20 +43,22 @@ function AppContent() {
               <div className="flex flex-col min-h-screen">
                 <Navbar />
                 <main className="flex-1">
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/product/:id" element={<ProductDetails />} />
-                    <Route path="/cart" element={<Cart />} />
-                    <Route path="/wishlist" element={<Wishlist />} />
-                    <Route path="/checkout" element={<Checkout />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route element={<ProtectedRoute />}>
-                      <Route path="/account" element={<Account />} />
-                    </Route>
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                  <Suspense fallback={<PageFallback />}>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/products" element={<Products />} />
+                      <Route path="/product/:id" element={<ProductDetails />} />
+                      <Route path="/cart" element={<Cart />} />
+                      <Route path="/wishlist" element={<Wishlist />} />
+                      <Route path="/checkout" element={<Checkout />} />
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/register" element={<Register />} />
+                      <Route element={<ProtectedRoute />}>
+                        <Route path="/account" element={<Account />} />
+                      </Route>
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
                 </main>
                 <Footer />
                 <ToastContainer />

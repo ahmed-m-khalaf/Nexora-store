@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { FiCheckCircle, FiEdit3, FiMessageSquare, FiStar, FiUser } from 'react-icons/fi'
 import type { Product, Review } from '../../types'
 import { useToast } from '../../features/toast/useToast'
@@ -38,7 +38,28 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
     const { success, error: toastError } = useToast()
     const storageKey = `nexora_reviews_${product.id}`
 
-    const [reviews, setReviews] = useState<Review[]>([])
+    const [reviews, setReviews] = useState<Review[]>(() => {
+        try {
+            const saved = localStorage.getItem(storageKey)
+            if (saved) {
+                return JSON.parse(saved)
+            }
+            const seeded: Review[] = DEFAULT_REVIEW_TEMPLATES.default.map((tpl, idx) => ({
+                id: `seed_${product.id}_${idx}`,
+                productId: product.id,
+                userName: tpl.name,
+                rating: tpl.rating,
+                title: tpl.title,
+                comment: tpl.comment,
+                createdAt: new Date(Date.now() - tpl.daysAgo * 86400000).toISOString(),
+                verified: true,
+            }))
+            localStorage.setItem(storageKey, JSON.stringify(seeded))
+            return seeded
+        } catch {
+            return []
+        }
+    })
     const [selectedFilter, setSelectedFilter] = useState<number | 'all'>('all')
     const [isFormOpen, setIsFormOpen] = useState(false)
 
@@ -49,32 +70,6 @@ export default function ProductReviews({ product }: ProductReviewsProps) {
     const [title, setTitle] = useState('')
     const [comment, setComment] = useState('')
     const [submitting, setSubmitting] = useState(false)
-
-    // Load existing reviews from localStorage or seed initial ones
-    useEffect(() => {
-        try {
-            const saved = localStorage.getItem(storageKey)
-            if (saved) {
-                setReviews(JSON.parse(saved))
-            } else {
-                // Generate seeded reviews using product rating
-                const seeded: Review[] = DEFAULT_REVIEW_TEMPLATES.default.map((tpl, idx) => ({
-                    id: `seed_${product.id}_${idx}`,
-                    productId: product.id,
-                    userName: tpl.name,
-                    rating: tpl.rating,
-                    title: tpl.title,
-                    comment: tpl.comment,
-                    createdAt: new Date(Date.now() - tpl.daysAgo * 86400000).toISOString(),
-                    verified: true,
-                }))
-                setReviews(seeded)
-                localStorage.setItem(storageKey, JSON.stringify(seeded))
-            }
-        } catch {
-            // fallback
-        }
-    }, [product.id, storageKey])
 
     // Calculate metrics
     const totalReviews = reviews.length

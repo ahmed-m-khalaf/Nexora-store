@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { FiX, FiShoppingBag, FiArrowRight, FiTrash2, FiMinus, FiPlus } from 'react-icons/fi'
 import gsap from 'gsap'
 import { useCart } from '../../features/cart/useCart'
-import { useCartDrawer, closeCartDrawer } from '../../hooks/useCartDrawer'
+import { useCartDrawer } from '../../hooks/useCartDrawer'
 import { useCoupon } from '../../features/coupons/useCoupon'
 import CouponInput from '../cart/CouponInput'
 
@@ -396,5 +396,3 @@ export default function CartDrawer() {
   )
 }
 
-// Re-export for convenience
-export { closeCartDrawer }

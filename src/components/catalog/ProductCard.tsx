@@ -87,6 +87,7 @@ function ProductCard({ product }: ProductCardProps) {
                             src={product.image || '/products/placeholder.svg'}
                             alt={product.title}
                             loading="lazy"
+                            decoding="async"
                             onError={(event) => {
                                 event.currentTarget.onerror = null
                                 event.currentTarget.src = '/products/placeholder.svg'

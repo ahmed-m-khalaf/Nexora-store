@@ -51,15 +51,15 @@ function Hero({ featuredProduct }: HeroProps) {
 
     return (
         <section ref={ref} className="relative isolate overflow-hidden bg-slate-950 text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(14,165,233,0.3),_transparent_40%),radial-gradient(circle_at_bottom_left,_rgba(20,184,166,0.18),_transparent_40%)]" />
-            <div className="hero-orb absolute -right-24 top-8 -z-0 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(29,88,246,0.25),_transparent_45%),radial-gradient(circle_at_bottom_left,_rgba(99,102,241,0.18),_transparent_45%)]" />
+            <div className="hero-orb absolute -right-24 top-8 -z-0 h-72 w-72 rounded-full bg-primary-500/20 blur-3xl" />
             <div className="container relative z-10 mx-auto grid min-h-[520px] items-center gap-10 px-4 py-20 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="max-w-2xl">
-                    <span className="hero-piece mb-5 inline-flex rounded-full border border-cyan-300/30 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 backdrop-blur">
+                    <span className="hero-piece mb-5 inline-flex rounded-full border border-primary-400/30 bg-primary-500/10 px-4 py-2 text-sm font-semibold text-primary-200 backdrop-blur">
                         Curated essentials · Designed for everyday
                     </span>
                     <h1 className="hero-piece text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl">
-                        Better products for your next <span className="text-cyan-300">everyday.</span>
+                        Better products for your next <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-sky-300 to-indigo-300">everyday.</span>
                     </h1>
                     <p className="hero-piece mt-6 max-w-xl text-lg leading-8 text-slate-300">
                         Discover a focused collection of useful, beautiful pieces — selected to make work, travel, and life feel lighter.
@@ -67,7 +67,7 @@ function Hero({ featuredProduct }: HeroProps) {
                     <div className="hero-piece mt-8 flex flex-wrap gap-4 mb-8">
                         <MagneticButton
                             strength={0.2}
-                            className="rounded-xl bg-cyan-400 px-6 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300"
+                            className="rounded-xl bg-primary-600 px-6 py-3 font-bold text-white shadow-lg shadow-primary-600/30 transition hover:bg-primary-500 active:scale-95"
                         >
                             <Link to="/products">
                                 Explore collection <span aria-hidden="true">→</span>
@@ -91,16 +91,16 @@ function Hero({ featuredProduct }: HeroProps) {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search products..."
-                                className="block w-full rounded-xl border border-white/20 bg-white/10 py-3.5 pl-11 pr-4 text-white placeholder:text-gray-400 focus:border-cyan-400 focus:bg-white/20 focus:outline-none focus:ring-1 focus:ring-cyan-400 backdrop-blur sm:text-sm"
+                                className="block w-full rounded-xl border border-white/20 bg-white/10 py-3.5 pl-11 pr-4 text-white placeholder:text-gray-400 focus:border-primary-400 focus:bg-white/20 focus:outline-none focus:ring-1 focus:ring-primary-400 backdrop-blur sm:text-sm"
                             />
-                            <button type="submit" className="absolute inset-y-1.5 right-1.5 rounded-lg bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-cyan-300 transition">
+                            <button type="submit" className="absolute inset-y-1.5 right-1.5 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-500 transition shadow-sm">
                                 Search
                             </button>
                         </div>
                     </form>
                 </div>
                 <Parallax speed={0.3} className="hero-piece relative mx-auto w-full max-w-md">
-                    <div className="absolute -inset-6 rounded-[2rem] bg-cyan-400/20 blur-2xl" />
+                    <div className="absolute -inset-6 rounded-[2rem] bg-primary-500/20 blur-2xl" />
                     <Link to={featuredProduct ? `/product/${featuredProduct.id}` : '#'} className="relative block rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl group hover:border-white/30 transition">
                         <img 
                             src={featuredProduct?.image || "/products/headphones.svg"} 

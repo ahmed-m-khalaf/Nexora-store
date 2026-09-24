@@ -7,7 +7,7 @@
 
 import confetti from 'canvas-confetti'
 
-const NEXORA_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981']
+const NEXORA_COLORS = ['#1d58f6', '#6366f1', '#06b6d4', '#f59e0b', '#10b981']
 
 /**
  * Celebrate order completion with confetti burst from both sides

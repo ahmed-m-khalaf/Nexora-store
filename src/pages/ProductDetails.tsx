@@ -104,6 +104,8 @@ function ProductDetails() {
             <img
               src={product.image}
               alt={product.title}
+              loading="eager"
+              decoding="async"
               onError={(event) => {
                 event.currentTarget.onerror = null
                 event.currentTarget.src = '/products/placeholder.svg'
