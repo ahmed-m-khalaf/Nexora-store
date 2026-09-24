@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { FiCheck, FiMinus, FiPlus, FiShoppingBag, FiStar, FiX } from 'react-icons/fi'
 import { useCart } from '../../features/cart/useCart'
+import { openCartDrawer } from '../../hooks/useCartDrawer'
+import WishlistButton from '../common/WishlistButton'
 import type { Product } from '../../types'
 
 type QuickViewModalProps = {
@@ -53,7 +55,8 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
             setTimeout(() => {
                 setAddStatus('idle')
                 handleClose()
-            }, 1000)
+                openCartDrawer()
+            }, 600)
         } catch {
             // Error is handled by context toast
         }
@@ -134,22 +137,23 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
                             </span>
                         </div>
 
-                        <div className="flex gap-4">
+                        <div className="flex gap-3 items-center">
                             <button
                                 onClick={handleAddToCart}
                                 disabled={isOutOfStock || addStatus === 'added'}
-                                className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-white transition ${
+                                className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-bold text-white transition ${
                                     addStatus === 'added' ? 'bg-green-600' :
-                                    isOutOfStock ? 'bg-gray-300' : 'bg-primary-600 hover:bg-primary-700'
+                                    isOutOfStock ? 'bg-gray-300' : 'bg-primary-600 hover:bg-primary-700 active:scale-95'
                                 }`}
                             >
                                 {addStatus === 'added' ? <><FiCheck /> Added</> : <><FiShoppingBag /> Add to Cart</>}
                             </button>
+                            <WishlistButton product={product} size="lg" />
                             <Link
                                 to={`/product/${product.id}`}
-                                className="flex items-center justify-center px-6 py-3 rounded-lg border border-gray-300 font-bold text-gray-700 hover:bg-gray-50 transition"
+                                className="flex items-center justify-center px-4 py-3 rounded-lg border border-gray-300 font-bold text-gray-700 hover:bg-gray-50 transition"
                             >
-                                View Details
+                                Details
                             </Link>
                         </div>
                     </div>

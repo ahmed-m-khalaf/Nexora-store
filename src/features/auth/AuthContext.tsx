@@ -30,6 +30,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
             setError(null)
             const result = await api.login(input, guestCartId())
             setStoredToken(result.token)
+            localStorage.removeItem('nexora_cart_id')
             setUser(result.user)
             return result.user
         } catch (loginError) {
@@ -44,6 +45,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
             setError(null)
             const result = await api.register(input, guestCartId())
             setStoredToken(result.token)
+            localStorage.removeItem('nexora_cart_id')
             setUser(result.user)
             return result.user
         } catch (registerError) {
@@ -55,6 +57,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
     const logout = useCallback(() => {
         clearStoredToken()
+        localStorage.removeItem('nexora_cart_id')
         setUser(null)
         setError(null)
     }, [])

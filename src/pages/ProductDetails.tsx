@@ -3,8 +3,11 @@ import { useParams, Link } from 'react-router-dom'
 import { FiCheck, FiChevronRight, FiMinus, FiPlus, FiShield, FiShoppingBag, FiStar, FiTruck } from 'react-icons/fi'
 import { api } from '../services/api'
 import { useCart } from '../features/cart/useCart'
+import { openCartDrawer } from '../hooks/useCartDrawer'
 import FadeIn from '../components/common/FadeIn'
 import ProductDetailsSkeleton from '../components/catalog/ProductDetailsSkeleton'
+import WishlistButton from '../components/common/WishlistButton'
+import ProductReviews from '../components/catalog/ProductReviews'
 import type { Product } from '../types'
 
 function ProductDetails() {
@@ -64,7 +67,10 @@ function ProductDetails() {
       setAddError('')
       await addToCart(product.id, quantity)
       setAddStatus('added')
-      window.setTimeout(() => setAddStatus('idle'), 1500)
+      window.setTimeout(() => {
+        setAddStatus('idle')
+        openCartDrawer()
+      }, 600)
     } catch (addError: unknown) {
       setAddStatus('error')
       setAddError(addError instanceof Error ? addError.message : 'Could not add this product.')
@@ -169,44 +175,53 @@ function ProductDetails() {
 
               {addStatus === 'error' && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{addError}</p>}
 
-              <button
-                ref={ctaRef}
-                onClick={handleAddToCart}
-                disabled={isOutOfStock || addStatus === 'added'}
-                className={`flex w-full items-center justify-center gap-2 rounded-lg py-4 font-bold text-white shadow-md transition active:scale-[0.99] disabled:cursor-not-allowed ${
-                  addStatus === 'added'
-                    ? 'bg-emerald-600'
-                    : isOutOfStock
-                      ? 'bg-slate-300 text-slate-500'
-                      : 'bg-primary-600 hover:bg-primary-700'
-                }`}
-              >
-                {addStatus === 'added' ? <><FiCheck aria-hidden /> Added to cart</> : <><FiShoppingBag aria-hidden /> Add to Cart</>}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  ref={ctaRef}
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock || addStatus === 'added'}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-4 font-bold text-white shadow-md transition active:scale-[0.99] disabled:cursor-not-allowed ${
+                    addStatus === 'added'
+                      ? 'bg-emerald-600'
+                      : isOutOfStock
+                        ? 'bg-slate-300 text-slate-500'
+                        : 'bg-primary-600 hover:bg-primary-700'
+                  }`}
+                >
+                  {addStatus === 'added' ? <><FiCheck aria-hidden /> Added to cart</> : <><FiShoppingBag aria-hidden /> Add to Cart</>}
+                </button>
+                <WishlistButton product={product} size="lg" showLabel />
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Customer Reviews & Ratings Section */}
+        <ProductReviews product={product} />
       </div>
 
       {/* Sticky Mobile Add-to-Cart */}
-      <div className={`fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-4 border-t border-slate-200 bg-white/90 p-4 backdrop-blur-lg transition-transform duration-300 md:hidden ${showSticky ? 'translate-y-0' : 'translate-y-full'}`}>
-          <div className="flex flex-col">
-              <span className="text-sm font-medium text-slate-500 line-clamp-1">{product.title}</span>
+      <div className={`fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between gap-3 border-t border-slate-200 bg-white/95 p-3.5 backdrop-blur-lg transition-transform duration-300 md:hidden ${showSticky ? 'translate-y-0' : 'translate-y-full'}`}>
+          <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-xs font-medium text-slate-500 line-clamp-1">{product.title}</span>
               <span className="font-bold text-slate-900">${product.price.toFixed(2)}</span>
           </div>
-          <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || addStatus === 'added'}
-              className={`flex h-11 min-w-[140px] flex-1 items-center justify-center gap-2 rounded-lg px-4 font-bold text-white shadow-sm transition active:scale-95 disabled:cursor-not-allowed ${
-                  addStatus === 'added'
-                      ? 'bg-emerald-600'
-                      : isOutOfStock
-                          ? 'bg-slate-300'
-                          : 'bg-primary-600 hover:bg-primary-700'
-              }`}
-          >
-              {addStatus === 'added' ? 'Added' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
-          </button>
+          <div className="flex items-center gap-2">
+              <WishlistButton product={product} size="md" />
+              <button
+                  onClick={handleAddToCart}
+                  disabled={isOutOfStock || addStatus === 'added'}
+                  className={`flex h-10 min-w-[120px] items-center justify-center gap-1.5 rounded-lg px-4 text-sm font-bold text-white shadow-sm transition active:scale-95 disabled:cursor-not-allowed ${
+                      addStatus === 'added'
+                          ? 'bg-emerald-600'
+                          : isOutOfStock
+                              ? 'bg-slate-300'
+                              : 'bg-primary-600 hover:bg-primary-700'
+                  }`}
+              >
+                  {addStatus === 'added' ? 'Added' : isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+              </button>
+          </div>
       </div>
     </FadeIn>
   )

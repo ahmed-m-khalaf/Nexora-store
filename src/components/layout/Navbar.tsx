@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
-import { FiShoppingBag, FiUser, FiLogOut, FiMenu, FiX, FiHome, FiGrid } from 'react-icons/fi'
+import { FiShoppingBag, FiUser, FiLogOut, FiMenu, FiX, FiHome, FiGrid, FiHeart } from 'react-icons/fi'
 import { useCart } from '../../features/cart/useCart'
+import { useWishlist } from '../../features/wishlist/useWishlist'
 import { useAuth } from '../../features/auth/useAuth'
+import { openCartDrawer } from '../../hooks/useCartDrawer'
 
 function Navbar() {
   const { getCartCount } = useCart()
+  const { wishlistCount } = useWishlist()
   const { user, logout } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const cartItemsCount = getCartCount()
@@ -46,17 +49,32 @@ function Navbar() {
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="hidden md:flex md:items-center md:gap-5">
-            {/* Cart Link */}
+          <div className="hidden md:flex md:items-center md:gap-4">
+            {/* Wishlist Link */}
             <NavLink
-              to="/cart"
+              to="/wishlist"
               className={({ isActive }) =>
                 `relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
                   isActive
-                    ? 'bg-primary-50 text-primary-700'
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-rose-50 text-rose-700'
+                    : 'text-slate-700 hover:bg-slate-100 hover:text-rose-600'
                 }`
               }
+              title="Wishlist"
+            >
+              <FiHeart className="h-5 w-5" />
+              <span>Wishlist</span>
+              {wishlistCount > 0 && (
+                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-xs font-bold text-white shadow-sm">
+                  {wishlistCount}
+                </span>
+              )}
+            </NavLink>
+
+            {/* Cart Button - Opens Drawer */}
+            <button
+              onClick={openCartDrawer}
+              className="relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
             >
               <FiShoppingBag className="h-5 w-5" />
               <span>Cart</span>
@@ -65,7 +83,7 @@ function Navbar() {
                   {cartItemsCount}
                 </span>
               )}
-            </NavLink>
+            </button>
 
             <div className="h-5 w-[1px] bg-slate-200" aria-hidden="true" />
 
@@ -110,20 +128,33 @@ function Navbar() {
           </div>
 
           {/* Mobile Hamburger Toggle */}
-          <div className="flex items-center gap-3 md:hidden">
+          <div className="flex items-center gap-1.5 md:hidden">
             <Link
-              to="/cart"
+              to="/wishlist"
               onClick={closeMenu}
+              className="relative rounded-lg p-2 text-slate-700 hover:bg-slate-100"
+              aria-label="Wishlist"
+            >
+              <FiHeart className="h-5 w-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
+            <button
+              onClick={() => { closeMenu(); openCartDrawer() }}
               className="relative rounded-lg p-2 text-slate-700 hover:bg-slate-100"
               aria-label="Cart"
             >
-              <FiShoppingBag className="h-6 w-6" />
+              <FiShoppingBag className="h-5 w-5" />
               {cartItemsCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-600 px-1 text-[10px] font-bold text-white">
                   {cartItemsCount}
                 </span>
               )}
-            </Link>
+            </button>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -166,13 +197,27 @@ function Navbar() {
               <span>Catalog</span>
             </NavLink>
             <NavLink
-              to="/cart"
+              to="/wishlist"
               onClick={closeMenu}
               className={({ isActive }) =>
                 `flex items-center justify-between rounded-lg px-3 py-2.5 text-base font-medium transition ${
-                  isActive ? 'bg-primary-50 text-primary-700' : 'text-slate-700 hover:bg-slate-50'
+                  isActive ? 'bg-rose-50 text-rose-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
                 }`
               }
+            >
+              <span className="flex items-center gap-3">
+                <FiHeart className="h-5 w-5 text-rose-500" />
+                <span>Wishlist</span>
+              </span>
+              {wishlistCount > 0 && (
+                <span className="rounded-full bg-rose-500 px-2 py-0.5 text-xs font-bold text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </NavLink>
+            <button
+              onClick={() => { closeMenu(); openCartDrawer() }}
+              className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-base font-medium text-slate-700 transition hover:bg-slate-50"
             >
               <span className="flex items-center gap-3">
                 <FiShoppingBag className="h-5 w-5" />
@@ -183,7 +228,7 @@ function Navbar() {
                   {cartItemsCount}
                 </span>
               )}
-            </NavLink>
+            </button>
           </div>
 
           <div className="my-3 border-t border-slate-100" />

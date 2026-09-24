@@ -59,9 +59,8 @@ const getOrCreateGuestCart = async (cartId) => {
     const existing = await prisma.cart.findUnique({ where: { id: normalizedId }, include: cartInclude });
     if (existing) {
       if (existing.userId) {
-        const error = new Error('This cart belongs to an authenticated user.');
-        error.statusCode = 403;
-        throw error;
+        // Stale cart ID from a previous session — create a fresh guest cart instead of blocking
+        return prisma.cart.create({ data: {}, include: cartInclude });
       }
       return existing;
     }

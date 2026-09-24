@@ -1,12 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { FiAlertCircle, FiRefreshCw, FiShoppingBag, FiArrowRight } from 'react-icons/fi'
 import { useCart } from '../features/cart/useCart'
+import { useCoupon } from '../features/coupons/useCoupon'
 import FadeIn from '../components/common/FadeIn'
 import Loader from '../components/common/Loader'
+import CouponInput from '../components/cart/CouponInput'
 
 function Cart() {
     const { cart, cartData, loading, error, clearCart, removeFromCart, updateQuantity, loadCart } = useCart()
+    const { applyCoupon, removeCoupon, getAppliedCoupon } = useCoupon()
     const navigate = useNavigate()
+
+    const appliedCoupon = getAppliedCoupon(cartData.subtotal, cartData.shipping)
+    const discountAmount = appliedCoupon?.discountAmount || 0
+    const finalTotal = Math.max(0, cartData.total - discountAmount)
 
     if (loading) return <Loader />
 
@@ -141,11 +148,29 @@ function Cart() {
                             </div>
                         </div>
 
+                        {/* Promo Code Box */}
+                        <div className="mb-6">
+                            <CouponInput
+                                appliedCoupon={appliedCoupon}
+                                subtotal={cartData.subtotal}
+                                shipping={cartData.shipping}
+                                onApply={(code) => applyCoupon(code, cartData.subtotal, cartData.shipping)}
+                                onRemove={removeCoupon}
+                                variant="full"
+                            />
+                        </div>
+
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
                                 <span className="font-medium">${cartData.subtotal.toFixed(2)}</span>
                             </div>
+                            {appliedCoupon && (
+                                <div className="flex justify-between text-emerald-600 font-medium">
+                                    <span>Promo Discount ({appliedCoupon.code})</span>
+                                    <span>-${discountAmount.toFixed(2)}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between text-gray-600">
                                 <span>Tax (10%)</span>
                                 <span className="font-medium">${cartData.tax.toFixed(2)}</span>
@@ -153,12 +178,21 @@ function Cart() {
                             <div className="flex justify-between text-gray-600">
                                 <span>Shipping</span>
                                 <span className="font-medium">
-                                    {cartData.shipping === 0 ? 'FREE' : `$${cartData.shipping.toFixed(2)}`}
+                                    {appliedCoupon?.type === 'free_shipping' || cartData.shipping === 0
+                                        ? 'FREE'
+                                        : `$${cartData.shipping.toFixed(2)}`}
                                 </span>
                             </div>
                             <div className="border-t border-gray-200 pt-4 flex justify-between text-xl font-bold text-gray-900">
                                 <span>Total</span>
-                                <span className="text-primary-600">${cartData.total.toFixed(2)}</span>
+                                <div className="text-right">
+                                    {discountAmount > 0 && (
+                                        <span className="text-sm font-normal text-slate-400 line-through mr-2">
+                                            ${cartData.total.toFixed(2)}
+                                        </span>
+                                    )}
+                                    <span className="text-primary-600">${finalTotal.toFixed(2)}</span>
+                                </div>
                             </div>
                         </div>
 

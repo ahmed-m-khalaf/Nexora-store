@@ -1,8 +1,11 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../features/cart/useCart'
+import { useCoupon } from '../features/coupons/useCoupon'
 import FadeIn from '../components/common/FadeIn'
 import Loader from '../components/common/Loader'
+import CouponInput from '../components/cart/CouponInput'
+import { celebrateOrder } from '../lib/confetti'
 import type { CheckoutCustomer, CheckoutFormErrors, Order } from '../types'
 import { getErrorMessage } from '../utils/errors'
 import { FiCheck } from 'react-icons/fi'
@@ -16,12 +19,17 @@ const emptyForm: CheckoutCustomer = {
 
 function Checkout() {
     const { cart, cartData, loading, checkout } = useCart()
+    const { applyCoupon, removeCoupon, getAppliedCoupon } = useCoupon()
     const [step, setStep] = useState<1 | 2>(1)
     const [form, setForm] = useState(emptyForm)
     const [errors, setErrors] = useState<CheckoutFormErrors>({})
     const [submitting, setSubmitting] = useState(false)
     const [submitError, setSubmitError] = useState('')
     const [order, setOrder] = useState<Order | null>(null)
+
+    const appliedCoupon = getAppliedCoupon(cartData.subtotal, cartData.shipping)
+    const discountAmount = appliedCoupon?.discountAmount || 0
+    const finalTotal = Math.max(0, cartData.total - discountAmount)
 
     const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = event.target
@@ -53,6 +61,7 @@ function Checkout() {
         try {
             const placedOrder = await checkout(form)
             setOrder(placedOrder)
+            celebrateOrder()
         } catch (error: unknown) {
             setSubmitError(getErrorMessage(error, 'We could not place your order. Please try again.'))
         } finally {
@@ -169,28 +178,64 @@ function Checkout() {
                                         Back
                                     </button>
                                     <button onClick={handleSubmit} disabled={submitting} className="flex-[2] rounded-lg bg-primary-600 py-3 font-bold text-white shadow-md transition hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-60">
-                                        {submitting ? 'Placing order…' : `Place Order — $${cartData.total.toFixed(2)}`}
+                                        {submitting ? 'Placing order…' : `Place Order — $${finalTotal.toFixed(2)}`}
                                     </button>
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    <aside className="h-fit rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm">
-                        <h2 className="mb-5 text-xl font-bold text-gray-900">Order Summary</h2>
-                        <div className="space-y-3 text-sm text-gray-600">
-                            {cart.map((item) => (
-                                <div key={item.id} className="flex justify-between gap-4 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                                    <span className="line-clamp-2">{item.product.title} <span className="font-semibold text-gray-400">×{item.quantity}</span></span>
-                                    <span className="font-medium text-gray-900">${item.subtotal.toFixed(2)}</span>
-                                </div>
-                            ))}
+                    <aside className="h-fit rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm space-y-5">
+                        <div>
+                            <h2 className="mb-4 text-xl font-bold text-gray-900">Order Summary</h2>
+                            <div className="space-y-3 text-sm text-gray-600 max-h-60 overflow-y-auto pr-1">
+                                {cart.map((item) => (
+                                    <div key={item.id} className="flex justify-between gap-4 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                                        <span className="line-clamp-2">{item.product.title} <span className="font-semibold text-gray-400">×{item.quantity}</span></span>
+                                        <span className="font-medium text-gray-900">${item.subtotal.toFixed(2)}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className="mt-5 space-y-2 border-t border-gray-200 pt-4 text-gray-600 text-sm">
+
+                        {/* Promo Code Box */}
+                        <CouponInput
+                            appliedCoupon={appliedCoupon}
+                            subtotal={cartData.subtotal}
+                            shipping={cartData.shipping}
+                            onApply={(code) => applyCoupon(code, cartData.subtotal, cartData.shipping)}
+                            onRemove={removeCoupon}
+                            variant="compact"
+                        />
+
+                        <div className="space-y-2 border-t border-gray-200 pt-4 text-gray-600 text-sm">
                             <div className="flex justify-between"><span>Subtotal</span><span className="font-medium text-gray-900">${cartData.subtotal.toFixed(2)}</span></div>
+                            {appliedCoupon && (
+                                <div className="flex justify-between text-emerald-600 font-medium">
+                                    <span>Promo Discount ({appliedCoupon.code})</span>
+                                    <span>-${discountAmount.toFixed(2)}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between"><span>Tax</span><span className="font-medium text-gray-900">${cartData.tax.toFixed(2)}</span></div>
-                            <div className="flex justify-between"><span>Shipping</span><span className="font-medium text-gray-900">{cartData.shipping === 0 ? 'FREE' : `$${cartData.shipping.toFixed(2)}`}</span></div>
-                            <div className="flex justify-between pt-3 text-lg font-bold text-gray-900"><span>Total</span><span className="text-primary-600">${cartData.total.toFixed(2)}</span></div>
+                            <div className="flex justify-between">
+                                <span>Shipping</span>
+                                <span className="font-medium text-gray-900">
+                                    {appliedCoupon?.type === 'free_shipping' || cartData.shipping === 0
+                                        ? 'FREE'
+                                        : `$${cartData.shipping.toFixed(2)}`}
+                                </span>
+                            </div>
+                            <div className="flex justify-between pt-3 text-lg font-bold text-gray-900 border-t border-gray-200">
+                                <span>Total</span>
+                                <div className="text-right">
+                                    {discountAmount > 0 && (
+                                        <span className="text-sm font-normal text-slate-400 line-through mr-2">
+                                            ${cartData.total.toFixed(2)}
+                                        </span>
+                                    )}
+                                    <span className="text-primary-600">${finalTotal.toFixed(2)}</span>
+                                </div>
+                            </div>
                         </div>
                     </aside>
                 </div>

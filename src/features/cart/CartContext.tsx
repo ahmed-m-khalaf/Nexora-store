@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
-import { api } from '../../services/api'
+import { api, getStoredToken } from '../../services/api'
 import type { CartContextValue, CartData, CartProductInput, CheckoutCustomer } from '../../types'
 import { getErrorMessage } from '../../utils/errors'
 import { CartContext } from './cartContextValue'
@@ -27,8 +27,16 @@ export function CartProvider({ children }: PropsWithChildren) {
     const [cartData, setCartData] = useState<CartData>(EMPTY_CART)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const [guestCartId] = useState<string>(getOrCreateGuestCartId)
+    const [guestCartId, setGuestCartId] = useState<string>(getOrCreateGuestCartId)
     const cartId = user?.cartId || guestCartId
+
+    // Regenerate guest cart ID when user logs out (localStorage cleared by AuthContext)
+    useEffect(() => {
+        if (!user && !getStoredToken()) {
+            const freshId = getOrCreateGuestCartId()
+            setGuestCartId(freshId)
+        }
+    }, [user])
 
     const loadCart = useCallback(async () => {
         try {
@@ -36,7 +44,10 @@ export function CartProvider({ children }: PropsWithChildren) {
             setError(null)
             const data = await api.getCart(cartId)
             setCartData(data)
-            if (!user && data.id && data.id !== cartId) localStorage.setItem('nexora_cart_id', data.id)
+            if (!user && !getStoredToken() && data.id && data.id !== cartId) {
+                localStorage.setItem('nexora_cart_id', data.id)
+                setGuestCartId(data.id)
+            }
         } catch (loadError) {
             setError(getErrorMessage(loadError, 'Failed to load cart'))
         } finally {

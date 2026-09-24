@@ -82,7 +82,8 @@ export const migrateGuestCart = async (tx, userId, guestCartId) => {
 
   if (!guestCart) return userCart;
   if (guestCart.userId && guestCart.userId !== userId) {
-    throw new AuthError(403, 'This cart belongs to another user.');
+    // Stale cart from another user's session — skip migration, don't block registration
+    return userCart;
   }
 
   for (const item of guestCart.items) {

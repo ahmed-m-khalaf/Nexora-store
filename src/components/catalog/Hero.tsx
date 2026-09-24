@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import gsap from 'gsap'
 import { FiSearch } from 'react-icons/fi'
+import MagneticButton from '../common/MagneticButton'
+import Parallax from '../common/Parallax'
 import type { Product } from '../../types'
 
 type HeroProps = {
@@ -63,12 +65,20 @@ function Hero({ featuredProduct }: HeroProps) {
                         Discover a focused collection of useful, beautiful pieces — selected to make work, travel, and life feel lighter.
                     </p>
                     <div className="hero-piece mt-8 flex flex-wrap gap-4 mb-8">
-                        <Link to="/products" className="rounded-xl bg-cyan-400 px-6 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300">
-                            Explore collection <span aria-hidden="true">→</span>
-                        </Link>
-                        <Link to="/products?category=electronics" className="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-white/50 hover:bg-white/10">
-                            Shop tech
-                        </Link>
+                        <MagneticButton
+                            strength={0.2}
+                            className="rounded-xl bg-cyan-400 px-6 py-3 font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-300"
+                        >
+                            <Link to="/products">
+                                Explore collection <span aria-hidden="true">→</span>
+                            </Link>
+                        </MagneticButton>
+                        <MagneticButton
+                            strength={0.2}
+                            className="rounded-xl border border-white/20 px-6 py-3 font-semibold text-white transition hover:border-white/50 hover:bg-white/10"
+                        >
+                            <Link to="/products?category=electronics">Shop tech</Link>
+                        </MagneticButton>
                     </div>
 
                     <form onSubmit={handleSearch} className="hero-piece relative max-w-md">
@@ -89,7 +99,7 @@ function Hero({ featuredProduct }: HeroProps) {
                         </div>
                     </form>
                 </div>
-                <div className="hero-piece relative mx-auto w-full max-w-md">
+                <Parallax speed={0.3} className="hero-piece relative mx-auto w-full max-w-md">
                     <div className="absolute -inset-6 rounded-[2rem] bg-cyan-400/20 blur-2xl" />
                     <Link to={featuredProduct ? `/product/${featuredProduct.id}` : '#'} className="relative block rounded-[2rem] border border-white/15 bg-white/10 p-5 shadow-2xl backdrop-blur-xl group hover:border-white/30 transition">
                         <img 
@@ -111,7 +121,7 @@ function Hero({ featuredProduct }: HeroProps) {
                             </span>
                         </div>
                     </Link>
-                </div>
+                </Parallax>
             </div>
         </section>
     )

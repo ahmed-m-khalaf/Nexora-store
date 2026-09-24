@@ -182,3 +182,38 @@ export type ToastContextValue = {
     info: (message: string, action?: Toast['action']) => void
     warning: (message: string, action?: Toast['action']) => void
 }
+
+export type WishlistContextValue = {
+    wishlist: Product[]
+    wishlistCount: number
+    addToWishlist: (product: Product) => void
+    removeFromWishlist: (productId: number) => void
+    toggleWishlist: (product: Product) => void
+    isInWishlist: (productId: number) => boolean
+    clearWishlist: () => void
+    moveToCart: (product: Product) => Promise<void>
+}
+
+export type Coupon = {
+    code: string
+    type: 'percentage' | 'fixed' | 'free_shipping'
+    value: number
+    description: string
+    minSpend?: number
+}
+
+export type AppliedCoupon = Coupon & {
+    discountAmount: number
+}
+
+export type Review = {
+    id: string
+    productId: number
+    userName: string
+    rating: number
+    title: string
+    comment: string
+    createdAt: string
+    verified: boolean
+}
+

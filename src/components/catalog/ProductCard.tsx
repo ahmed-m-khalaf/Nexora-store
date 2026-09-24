@@ -5,6 +5,7 @@ import { FiCheck, FiEye, FiShoppingBag } from 'react-icons/fi'
 import type { Product } from '../../types'
 import { useCart } from '../../features/cart/useCart'
 import QuickViewModal from './QuickViewModal'
+import WishlistButton from '../common/WishlistButton'
 
 type ProductCardProps = { product: Product }
 
@@ -64,26 +65,35 @@ function ProductCard({ product }: ProductCardProps) {
     return (
         <>
             <article ref={cardRef} data-product-card onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} className="group flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl relative">
-                <Link to={`/product/${product.id}`} className="relative block overflow-hidden bg-slate-50 p-5 group/image">
-                    <span className="absolute left-4 top-4 z-10 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold capitalize text-slate-600 shadow-sm backdrop-blur">
-                        {product.category}
-                    </span>
-                    <span className={`absolute right-4 top-4 z-10 rounded-full px-3 py-1 text-xs font-semibold shadow-sm backdrop-blur ${
-                        isOutOfStock ? 'bg-red-50 text-red-700' : isLowStock ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'
-                    }`}>
-                        {isOutOfStock ? 'Out of stock' : isLowStock ? `${stock} left` : 'In stock'}
-                    </span>
-                    <img
-                        ref={imageRef}
-                        src={product.image || '/products/placeholder.svg'}
-                        alt={product.title}
-                        loading="lazy"
-                        onError={(event) => {
-                            event.currentTarget.onerror = null
-                            event.currentTarget.src = '/products/placeholder.svg'
-                        }}
-                        className="h-64 w-full object-contain transition-transform"
-                    />
+                <div className="relative block overflow-hidden bg-slate-50 p-5 group/image">
+                    <div className="absolute left-3 top-3 z-10 flex flex-col gap-1.5 items-start">
+                        <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-semibold capitalize text-slate-600 shadow-sm backdrop-blur">
+                            {product.category}
+                        </span>
+                        <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold shadow-sm backdrop-blur ${
+                            isOutOfStock ? 'bg-red-50 text-red-700' : isLowStock ? 'bg-amber-50 text-amber-700' : 'bg-emerald-50 text-emerald-700'
+                        }`}>
+                            {isOutOfStock ? 'Out of stock' : isLowStock ? `${stock} left` : 'In stock'}
+                        </span>
+                    </div>
+                    
+                    <div className="absolute right-3 top-3 z-20">
+                        <WishlistButton product={product} size="sm" />
+                    </div>
+
+                    <Link to={`/product/${product.id}`} className="block">
+                        <img
+                            ref={imageRef}
+                            src={product.image || '/products/placeholder.svg'}
+                            alt={product.title}
+                            loading="lazy"
+                            onError={(event) => {
+                                event.currentTarget.onerror = null
+                                event.currentTarget.src = '/products/placeholder.svg'
+                            }}
+                            className="h-64 w-full object-contain transition-transform"
+                        />
+                    </Link>
                     
                     {/* Quick View Button on Image Hover */}
                     <button
@@ -93,7 +103,7 @@ function ProductCard({ product }: ProductCardProps) {
                         <FiEye className="w-4 h-4" />
                         Quick View
                     </button>
-                </Link>
+                </div>
                 <div className="flex flex-1 flex-col p-5">
                     <Link to={`/product/${product.id}`}>
                         <h3 className="mb-2 line-clamp-2 h-14 text-lg font-semibold text-slate-900 transition-colors group-hover:text-primary-600">
