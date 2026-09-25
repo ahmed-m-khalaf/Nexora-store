@@ -10,15 +10,30 @@ import { apiLimiter, authLimiter, checkoutLimiter } from './middleware/rateLimit
 
 const app = express();
 
+const configuredCorsOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean)
+  : [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'https://nexora-store-six.vercel.app',
+    ];
+
+const isNexoraVercelPreview = (origin) => (
+  /^https:\/\/nexora-store-[a-z0-9-]+-ahmed-m-khalafs-projects\.vercel\.app$/i.test(origin)
+);
+
 // Security Headers
 app.use(helmet());
 
-// Enable CORS for all origins & methods
+// Allow configured app origins plus deployment previews for this Vercel project.
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN
-      ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-      : ['http://localhost:5173', 'http://localhost:5174'],
+    origin: (origin, callback) => {
+      if (!origin || configuredCorsOrigins.includes(origin) || isNexoraVercelPreview(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Origin not allowed by CORS'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'x-cart-id'],
