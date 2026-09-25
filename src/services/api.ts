@@ -12,7 +12,32 @@ import type {
     User,
 } from '../types'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_BASE_URL = (() => {
+    const defaultUrl = import.meta.env.PROD
+        ? 'https://nexora-store-production.up.railway.app/api'
+        : 'http://localhost:5000/api'
+    const configuredUrl = import.meta.env.VITE_API_URL?.trim()
+
+    if (!configuredUrl) return defaultUrl
+
+    try {
+        const apiUrl = new URL(configuredUrl)
+
+        // This project serves only the SPA from Vercel; its API lives on Railway.
+        // A same-origin URL here means the Vercel env var points at the frontend by mistake.
+        if (typeof window !== 'undefined' && apiUrl.origin === window.location.origin) {
+            return defaultUrl
+        }
+
+        const path = apiUrl.pathname.replace(/\/+$/, '')
+        apiUrl.pathname = path.endsWith('/api') ? path : `${path}/api`
+        apiUrl.search = ''
+        apiUrl.hash = ''
+        return apiUrl.toString().replace(/\/$/, '')
+    } catch {
+        return defaultUrl
+    }
+})()
 const TOKEN_KEY = 'nexora_access_token'
 
 export const getStoredToken = () => localStorage.getItem(TOKEN_KEY)
