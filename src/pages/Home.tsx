@@ -6,6 +6,7 @@ import FadeIn from '../components/common/FadeIn'
 import ScrollReveal from '../components/common/ScrollReveal'
 import type { Product } from '../types'
 import { getErrorMessage } from '../utils/errors'
+import RecentlyViewed from '../components/catalog/RecentlyViewed'
 
 function Home() {
     const [products, setProducts] = useState<Product[]>([])
@@ -60,6 +61,7 @@ function Home() {
                         ) : <ProductGrid products={products} loading={loading} skeletonCount={4} />}
                     </div>
                 </ScrollReveal>
+                <RecentlyViewed />
             </div>
         </FadeIn>
     )

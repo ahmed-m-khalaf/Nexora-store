@@ -8,6 +8,8 @@ import FadeIn from '../components/common/FadeIn'
 import ProductDetailsSkeleton from '../components/catalog/ProductDetailsSkeleton'
 import WishlistButton from '../components/common/WishlistButton'
 import ProductReviews from '../components/catalog/ProductReviews'
+import RecentlyViewed from '../components/catalog/RecentlyViewed'
+import { rememberViewedProduct } from '../utils/recentlyViewed'
 import type { Product } from '../types'
 
 function ProductDetails() {
@@ -42,6 +44,8 @@ function ProductDetails() {
 
     void fetchProduct()
   }, [id])
+
+  useEffect(() => { if (product) rememberViewedProduct(product) }, [product])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -200,6 +204,7 @@ function ProductDetails() {
 
         {/* Customer Reviews & Ratings Section */}
         <ProductReviews product={product} />
+        <RecentlyViewed excludeId={product.id} />
       </div>
 
       {/* Sticky Mobile Add-to-Cart */}

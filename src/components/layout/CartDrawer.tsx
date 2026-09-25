@@ -6,7 +6,7 @@
  * Supports swipe-to-dismiss on mobile and keyboard (Escape) to close.
  */
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiX, FiShoppingBag, FiArrowRight, FiTrash2, FiMinus, FiPlus } from 'react-icons/fi'
 import gsap from 'gsap'
@@ -14,10 +14,26 @@ import { useCart } from '../../features/cart/useCart'
 import { useCartDrawer } from '../../hooks/useCartDrawer'
 import { useCoupon } from '../../features/coupons/useCoupon'
 import CouponInput from '../cart/CouponInput'
+import { api } from '../../services/api'
+import type { Product } from '../../types'
 
 export default function CartDrawer() {
   const { isOpen, close } = useCartDrawer()
-  const { cart, cartData, loading, removeFromCart, updateQuantity, clearCart } = useCart()
+  const { cart, cartData, loading, removeFromCart, updateQuantity, clearCart, addToCart } = useCart()
+  const [suggestions, setSuggestions] = useState<Product[]>([])
+
+  useEffect(() => {
+    if (!isOpen || cart.length === 0) return
+    let active = true
+    const cartIds = new Set(cart.map(item => item.productId))
+    const cartCategories = new Set(cart.map(item => item.product.category))
+    api.getAllProducts().then(({ data }) => {
+      if (active) setSuggestions(data.filter(product => !cartIds.has(product.id) && (product.stock ?? 0) > 0)
+        .sort((a, b) => Number(cartCategories.has(b.category)) - Number(cartCategories.has(a.category)))
+        .slice(0, 2))
+    }).catch(() => { if (active) setSuggestions([]) })
+    return () => { active = false }
+  }, [isOpen, cart])
   const { applyCoupon, removeCoupon, getAppliedCoupon } = useCoupon()
   const navigate = useNavigate()
 
@@ -243,6 +259,17 @@ export default function CartDrawer() {
                 />
               </div>
             </div>
+
+            {suggestions.length > 0 && <div className="border-b border-slate-100 px-5 py-3">
+              <p className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">{cartData.subtotal < 100 ? `Add an item toward free shipping · $${(100 - cartData.subtotal).toFixed(2)} to go` : 'You may also like'}</p>
+              <div className="space-y-2">
+                {suggestions.map(product => <div key={product.id} className="flex items-center gap-3 rounded-lg bg-slate-50 p-2">
+                  <img src={product.image} alt="" className="h-10 w-10 rounded object-contain" />
+                  <div className="min-w-0 flex-1"><p className="truncate text-xs font-medium text-slate-800">{product.title}</p><p className="text-xs font-bold text-primary-700">${product.price.toFixed(2)}</p></div>
+                  <button onClick={() => void addToCart(product.id).then(() => setSuggestions(current => current.filter(item => item.id !== product.id))).catch(() => undefined)} className="rounded-lg border border-primary-200 px-2.5 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-50" aria-label={`Add ${product.title} to cart`}>Add</button>
+                </div>)}
+              </div>
+            </div>}
 
             {/* Items list */}
             <div ref={itemsRef} className="flex-1 overflow-y-auto overscroll-contain px-5 py-3">

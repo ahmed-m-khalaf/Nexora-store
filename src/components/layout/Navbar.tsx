@@ -5,6 +5,7 @@ import { useCart } from '../../features/cart/useCart'
 import { useWishlist } from '../../features/wishlist/useWishlist'
 import { useAuth } from '../../features/auth/useAuth'
 import { openCartDrawer } from '../../hooks/useCartDrawer'
+import LiveSearch from '../catalog/LiveSearch'
 
 function Navbar() {
   const { getCartCount } = useCart()
@@ -22,13 +23,13 @@ function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+      <div className="container mx-auto max-w-[1680px] px-4 sm:px-6 lg:px-8">
+        <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center">
           {/* Brand Logo */}
           <Link
             to="/"
             onClick={closeMenu}
-            className="flex items-center gap-2.5 text-xl font-bold tracking-tight text-slate-900 transition hover:opacity-90"
+            className="flex items-center gap-2.5 font-display text-xl font-semibold tracking-tight text-slate-900 transition hover:opacity-90"
           >
             <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white shadow-sm">
               <FiShoppingBag className="h-5 w-5" />
@@ -37,7 +38,7 @@ function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex md:items-center md:gap-8">
+          <div className="hidden xl:flex xl:items-center xl:gap-8">
             <NavLink to="/" className={navLinkClass}>
               <FiHome className="h-4 w-4" />
               <span>Home</span>
@@ -49,7 +50,8 @@ function Navbar() {
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="hidden md:flex md:items-center md:gap-4">
+          <div className="hidden justify-self-end xl:flex xl:items-center xl:gap-3">
+            <LiveSearch />
             {/* Wishlist Link */}
             <NavLink
               to="/wishlist"
@@ -128,7 +130,8 @@ function Navbar() {
           </div>
 
           {/* Mobile Hamburger Toggle */}
-          <div className="flex items-center gap-1.5 md:hidden">
+          <div className="col-start-3 flex items-center justify-self-end gap-1.5 xl:hidden">
+            <LiveSearch compact />
             <Link
               to="/wishlist"
               onClick={closeMenu}
@@ -170,7 +173,7 @@ function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="border-b border-slate-200 bg-white px-4 pt-2 pb-6 shadow-xl md:hidden">
+        <div className="border-b border-slate-200 bg-white px-4 pt-2 pb-6 shadow-xl xl:hidden">
           <div className="space-y-1">
             <NavLink
               to="/"

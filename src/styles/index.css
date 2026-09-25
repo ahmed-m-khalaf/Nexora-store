@@ -1,22 +1,48 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 @theme {
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-sans: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* Signature Royal Cobalt & Electric Sapphire Palette */
-  --color-primary-50: #f0f6ff;
-  --color-primary-100: #e0edff;
-  --color-primary-200: #c2ddff;
-  --color-primary-300: #93c4ff;
-  --color-primary-400: #5ea4ff;
-  --color-primary-500: #357eff;
-  --color-primary-600: #1d58f6;
-  --color-primary-700: #1444db;
-  --color-primary-800: #1638b0;
-  --color-primary-900: #18338b;
-  --color-primary-950: #111f54;
+  /* Nexora palette: deep blue and warm ivory from the selected reference. */
+  --color-brand-cream: #f8f0e5;
+  --color-primary-50: #f8f0e5;
+  --color-primary-100: #f1e7d9;
+  --color-primary-200: #e4d7c3;
+  --color-primary-300: #c2c9d5;
+  --color-primary-400: #8295b1;
+  --color-primary-500: #385b88;
+  --color-primary-600: #082052;
+  --color-primary-700: #061a45;
+  --color-primary-800: #041538;
+  --color-primary-900: #03102b;
+  --color-primary-950: #02091a;
+
+  /* Warm neutral surfaces keep existing slate/gray utility classes on-brand. */
+  --color-slate-50: #fcfaf6;
+  --color-slate-100: #f4efe7;
+  --color-slate-200: #e8e0d4;
+  --color-slate-300: #d5cabc;
+  --color-slate-400: #a69a89;
+  --color-slate-500: #786f63;
+  --color-slate-600: #5d554b;
+  --color-slate-700: #403a34;
+  --color-slate-800: #292c32;
+  --color-slate-900: #172b4d;
+  --color-slate-950: #082052;
+
+  --color-gray-50: #fcfaf6;
+  --color-gray-100: #f4efe7;
+  --color-gray-200: #e8e0d4;
+  --color-gray-300: #d5cabc;
+  --color-gray-400: #a69a89;
+  --color-gray-500: #786f63;
+  --color-gray-600: #5d554b;
+  --color-gray-700: #403a34;
+  --color-gray-800: #292c32;
+  --color-gray-900: #172b4d;
+  --color-gray-950: #082052;
 }
 
 @layer base {
@@ -25,7 +51,7 @@
   }
 
   ::selection {
-    background-color: #1d58f6;
+    background-color: #082052;
     color: #ffffff;
   }
 
@@ -34,8 +60,14 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #ffffff;
-    color: #0f172a;
+    background-color: var(--color-brand-cream);
+    color: #172b4d;
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    text-wrap: pretty;
   }
 
   #root {
@@ -87,7 +119,7 @@
 
 @layer utilities {
   .shimmer {
-    background-image: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 50%, #f1f5f9 100%);
+    background-image: linear-gradient(90deg, #f4efe7 0px, #e8e0d4 50%, #f4efe7 100%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite linear;
   }

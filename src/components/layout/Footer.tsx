@@ -223,7 +223,7 @@ export default function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-12 lg:gap-12">
           {/* Brand Identity & Mission */}
           <div className="col-span-2 md:col-span-4 lg:col-span-4 space-y-5">
-            <Link to="/" className="inline-flex items-center gap-2.5 text-2xl font-black tracking-tight text-white transition hover:opacity-90">
+            <Link to="/" className="inline-flex items-center gap-2.5 font-display text-2xl font-semibold tracking-tight text-white transition hover:opacity-90">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600 text-white shadow-lg shadow-primary-600/30">
                 <FiShoppingBag className="h-5 w-5" />
               </span>

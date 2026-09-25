@@ -7,6 +7,7 @@ export const validateGetProducts = [
   query('categoryId').optional().toInt().isInt({ min: 1 }),
   query('minPrice').optional().toFloat().isFloat({ min: 0 }),
   query('maxPrice').optional().toFloat().isFloat({ min: 0 }),
+  query('inStock').optional().isBoolean(),
   query('sortBy').optional().isIn(['id', 'title', 'price', 'createdAt']),
   query('order').optional().isIn(['asc', 'desc'])
 ];

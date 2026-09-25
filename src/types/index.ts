@@ -36,6 +36,9 @@ export type ProductQuery = {
     limit?: number
     sortBy?: ProductSortField
     order?: SortOrder
+    minPrice?: number
+    maxPrice?: number
+    inStock?: boolean
 }
 
 export type ProductsResponse = {
@@ -159,6 +162,7 @@ export type ApiClient = {
     register: (input: RegisterInput, guestCartId?: string) => Promise<AuthResponse>
     login: (input: AuthCredentials, guestCartId?: string) => Promise<AuthResponse>
     getCurrentUser: () => Promise<{ user: User }>
+    getMyOrders: () => Promise<Order[]>
 }
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning'

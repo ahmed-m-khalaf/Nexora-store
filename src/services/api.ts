@@ -49,12 +49,15 @@ async function apiFetch<T>(url: string, options: RequestInit = {}): Promise<T> {
 }
 
 export const api: ApiClient = {
-    getProducts: async ({ search, category, page = 1, limit = 12, sortBy, order }: ProductQuery = {}) => {
+    getProducts: async ({ search, category, page = 1, limit = 12, sortBy, order, minPrice, maxPrice, inStock }: ProductQuery = {}) => {
         const params = new URLSearchParams({ page: String(page), limit: String(limit) })
         if (search?.trim()) params.set('search', search.trim())
         if (category && category !== 'all') params.set('category', category)
         if (sortBy) params.set('sortBy', sortBy)
         if (order) params.set('order', order)
+        if (minPrice !== undefined) params.set('minPrice', String(minPrice))
+        if (maxPrice !== undefined) params.set('maxPrice', String(maxPrice))
+        if (inStock) params.set('inStock', 'true')
         return apiFetch<ProductsResponse>(`${API_BASE_URL}/products?${params.toString()}`)
     },
     getAllProducts: () => apiFetch<ProductsResponse>(`${API_BASE_URL}/products?page=1&limit=100`),
@@ -106,4 +109,5 @@ export const api: ApiClient = {
         body: JSON.stringify(input),
     }),
     getCurrentUser: () => apiFetch<{ user: User }>(`${API_BASE_URL}/auth/me`),
+    getMyOrders: () => apiFetch<Order[]>(`${API_BASE_URL}/orders/mine`),
 }

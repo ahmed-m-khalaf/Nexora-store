@@ -36,7 +36,7 @@ const parsePositiveInt = (value) => {
 // Supports: ?search=shirt &category=electronics &categoryId=1 &sortBy=price &order=asc &page=1 &limit=12
 export const getAllProducts = async (req, res, next) => {
   try {
-    const { search, category, categoryId, sortBy, order, page, limit, minPrice, maxPrice } = req.query;
+    const { search, category, categoryId, sortBy, order, page, limit, minPrice, maxPrice, inStock } = req.query;
 
     // --- Validation ---
     const pageNum = parsePositiveInt(page) ?? 1;
@@ -90,6 +90,7 @@ export const getAllProducts = async (req, res, next) => {
       if (minPrice !== undefined) where.price.gte = parseFloat(minPrice);
       if (maxPrice !== undefined) where.price.lte = parseFloat(maxPrice);
     }
+    if (inStock === 'true') where.stock = { gt: 0 };
 
     // 4. Sorting
     const validSortFields = ['id', 'title', 'price', 'createdAt'];

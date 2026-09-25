@@ -36,6 +36,11 @@ function Products() {
     const urlCategory = searchParams.get('category') || 'all'
     const urlSort = searchParams.get('sort') || 'id-asc'
     const urlPage = parseInt(searchParams.get('page') || '1', 10) || 1
+    const minPriceParam = searchParams.get('minPrice')
+    const maxPriceParam = searchParams.get('maxPrice')
+    const minPrice = minPriceParam === null ? undefined : Number(minPriceParam)
+    const maxPrice = maxPriceParam === null ? undefined : Number(maxPriceParam)
+    const inStock = searchParams.get('inStock') === 'true'
 
     const [searchTerm, setSearchTerm] = useState(urlSearch)
 
@@ -80,6 +85,9 @@ function Products() {
                 limit: ITEMS_PER_PAGE,
                 sortBy,
                 order,
+                minPrice,
+                maxPrice,
+                inStock,
             })
 
             setProducts(result.data)
@@ -90,7 +98,7 @@ function Products() {
         } finally {
             setLoading(false)
         }
-    }, [urlSearch, urlCategory, urlSort, urlPage])
+    }, [urlSearch, urlCategory, urlSort, urlPage, minPrice, maxPrice, inStock])
 
     useEffect(() => {
         fetchProducts()
@@ -108,6 +116,15 @@ function Products() {
     const setSortValue = (sort: string) => {
         setSearchParams(prev => {
             prev.set('sort', sort)
+            prev.set('page', '1')
+            return prev
+        })
+    }
+
+    const updateFilter = (key: 'minPrice' | 'maxPrice' | 'inStock', value: string | boolean) => {
+        setSearchParams(prev => {
+            if (value === '' || value === false) prev.delete(key)
+            else prev.set(key, String(value))
             prev.set('page', '1')
             return prev
         })
@@ -146,13 +163,50 @@ function Products() {
                 <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">Our Products</h1>
 
                 {/* Search & Filters */}
-                <div className="max-w-4xl mx-auto mb-8">
+                <div className="mx-auto mb-8 max-w-5xl">
                     <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
                     <CategoryFilter
                         categories={categories}
                         selectedCategory={urlCategory}
                         onSelectCategory={setCategory}
                     />
+
+                    <div className="mt-5 rounded-2xl border border-slate-200 bg-white/75 p-4 shadow-sm sm:p-5">
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h2 className="text-base font-semibold text-slate-900">Refine your search</h2>
+                                <p className="mt-0.5 text-xs text-slate-500">Set a price range or show only available items.</p>
+                            </div>
+                            <label className="inline-flex min-h-10 cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3.5 text-sm font-medium text-slate-700 transition hover:border-primary-300">
+                                <input type="checkbox" checked={inStock} onChange={e => updateFilter('inStock', e.target.checked)} className="h-4 w-4 accent-primary-600" />
+                                In stock only
+                            </label>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+                                <div className="mb-2 flex items-center justify-between gap-3">
+                                    <label htmlFor="min-price" className="text-sm font-semibold text-slate-700">Minimum price</label>
+                                    <div className="relative">
+                                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">$</span>
+                                        <input id="min-price" aria-label="Minimum price" type="number" min="0" value={searchParams.get('minPrice') || ''} onChange={e => updateFilter('minPrice', e.target.value)} placeholder="0" className="w-28 rounded-lg border border-slate-300 bg-white py-2 pl-6 pr-2 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100" />
+                                    </div>
+                                </div>
+                                <input aria-label="Minimum price slider" type="range" min="0" max="1000" step="5" value={minPrice ?? 0} onChange={e => updateFilter('minPrice', e.target.value === '0' ? '' : e.target.value)} className="block w-full accent-primary-600" />
+                                <div className="mt-1 flex justify-between text-[11px] text-slate-400"><span>$0</span><span>$1,000+</span></div>
+                            </div>
+                            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+                                <div className="mb-2 flex items-center justify-between gap-3">
+                                    <label htmlFor="max-price" className="text-sm font-semibold text-slate-700">Maximum price</label>
+                                    <div className="relative">
+                                        <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">$</span>
+                                        <input id="max-price" aria-label="Maximum price" type="number" min="0" value={searchParams.get('maxPrice') || ''} onChange={e => updateFilter('maxPrice', e.target.value)} placeholder="Any" className="w-28 rounded-lg border border-slate-300 bg-white py-2 pl-6 pr-2 text-sm text-slate-800 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100" />
+                                    </div>
+                                </div>
+                                <input aria-label="Maximum price slider" type="range" min="0" max="1000" step="5" value={maxPrice ?? 1000} onChange={e => updateFilter('maxPrice', e.target.value === '1000' ? '' : e.target.value)} className="block w-full accent-primary-600" />
+                                <div className="mt-1 flex justify-between text-[11px] text-slate-400"><span>$0</span><span>$1,000+</span></div>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Sort & Results Info Bar */}
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">

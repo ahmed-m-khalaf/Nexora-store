@@ -1,9 +1,24 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { FiUser, FiMail, FiShield, FiShoppingBag, FiLogOut, FiArrowRight } from 'react-icons/fi'
+import { FiUser, FiMail, FiShield, FiShoppingBag, FiLogOut, FiArrowRight, FiPackage } from 'react-icons/fi'
 import { useAuth } from '../features/auth/useAuth'
+import { api } from '../services/api'
+import type { Order } from '../types'
 
 export default function Account() {
   const { user, logout } = useAuth()
+  const [orders, setOrders] = useState<Order[]>([])
+  const [ordersLoading, setOrdersLoading] = useState(true)
+  const [ordersError, setOrdersError] = useState('')
+
+  useEffect(() => {
+    let active = true
+    api.getMyOrders().then(data => { if (active) setOrders(data) })
+      .catch(error => { if (active) setOrdersError(error instanceof Error ? error.message : 'Could not load your orders.') })
+      .finally(() => { if (active) setOrdersLoading(false) })
+    return () => { active = false }
+  }, [])
+
   if (!user) return null
 
   return (
@@ -32,6 +47,34 @@ export default function Account() {
           <FiLogOut className="h-4 w-4" />
           <span>Sign Out</span>
         </button>
+      </div>
+
+      <div className="mb-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-5 flex items-center gap-2">
+          <FiPackage className="text-primary-600" />
+          <h2 className="text-base font-bold text-slate-900">Your orders</h2>
+        </div>
+        {ordersLoading ? <p className="text-sm text-slate-500">Loading order history…</p> : ordersError ? <p role="alert" className="text-sm text-red-600">{ordersError}</p> : orders.length === 0 ? <p className="text-sm text-slate-500">No orders yet. Your purchases will appear here.</p> : (
+          <div className="space-y-4">
+            {orders.map(order => {
+              const steps = ['Order placed', 'Processing', 'Completed']
+              const currentStep = order.status === 'COMPLETED' ? 2 : order.status === 'CANCELLED' ? -1 : order.status === 'PROCESSING' ? 1 : 0
+              return <article key={order.id} className="rounded-lg border border-slate-100 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div><p className="font-semibold text-slate-900">Order #{order.id.slice(0, 8)}</p><p className="text-xs text-slate-500">{new Date(order.createdAt).toLocaleDateString()}</p></div>
+                  <span className="text-sm font-bold text-primary-700">${order.total.toFixed(2)} · {order.status.toLowerCase()}</span>
+                </div>
+                {order.status === 'CANCELLED' ? <p className="mt-3 text-sm text-red-600">This order was cancelled.</p> : <ol aria-label={`Order ${order.id} progress`} className="mt-4 grid grid-cols-3 gap-2">
+                  {steps.map((step, index) => <li key={step} className="flex items-center gap-2 text-xs">
+                    <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${index <= currentStep ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-400'}`}>{index < currentStep ? '✓' : index + 1}</span>
+                    <span className={index <= currentStep ? 'font-semibold text-slate-800' : 'text-slate-400'}>{step}</span>
+                  </li>)}
+                </ol>}
+                <p className="mt-3 text-xs text-slate-500">{order.items.length} item{order.items.length === 1 ? '' : 's'} · {order.items.map(item => `${item.title} × ${item.quantity}`).join(', ')}</p>
+              </article>
+            })}
+          </div>
+        )}
       </div>
 
       {/* Account Details & Shortcuts Grid */}

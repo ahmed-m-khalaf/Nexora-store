@@ -1,5 +1,19 @@
-import { checkoutCart } from '../services/orderService.js';
+import { checkoutCart, formatOrderResponse } from '../services/orderService.js';
 import { sendOrderConfirmationEmail } from '../services/emailService.js';
+import prisma from '../lib/prisma.js';
+
+export const getMyOrders = async (req, res, next) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId: req.user.id },
+      include: { items: true },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.status(200).json(orders.map(formatOrderResponse));
+  } catch (error) {
+    next(error);
+  }
+};
 
 // POST /api/orders/checkout
 // Prices and quantities always come from the database cart, never from the browser.
