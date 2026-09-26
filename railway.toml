@@ -1,0 +1,11 @@
+[build]
+builder = "RAILPACK"
+buildCommand = "npm ci --prefix backend --include=dev && npm run build --prefix backend"
+
+[deploy]
+preDeployCommand = ["cd backend && npx prisma migrate deploy", "npm run db:seed:catalog --prefix backend"]
+startCommand = "npm run start --prefix backend"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
